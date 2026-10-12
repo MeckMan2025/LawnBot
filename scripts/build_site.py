@@ -23,6 +23,7 @@ HEAD = """<!DOCTYPE html>
 <meta name="description" content="ClaudeBot: a fully 3D-printed outdoor patrol robot. Every printed part in build order with an interactive 3D view, print settings and the bought-parts list.">
 <meta name="theme-color" content="#e0601a">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }</style>
 """
 
 FAVICON = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
