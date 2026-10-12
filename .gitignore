@@ -1,0 +1,12 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Cloudflare
+.wrangler/
+
+# OS and editor
+.DS_Store
+*.log
+.claude/

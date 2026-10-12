@@ -1,0 +1,479 @@
+<title>ClaudeBot Preview</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: full-height viewer on the left, a parts/spec panel on the right; stacks at phone width. */
+  :root {
+    --bg: #f3f1ec;
+    --panel: #ffffff;
+    --fg: #1d1f21;
+    --muted: #65686d;
+    --line: #d9d5cc;
+    --accent: #e0601a;
+    --accent-ink: #ffffff;
+    --scene: #e9e6df;
+    --grass: #7f9d5a;
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191c; --panel: #1f2225; --fg: #eceae4; --muted: #9a9ea5; --line: #33373c;
+      --accent: #f07a30; --accent-ink: #1a1a1a; --scene: #202327; --grass: #4f6b3a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191c; --panel: #1f2225; --fg: #eceae4; --muted: #9a9ea5; --line: #33373c;
+    --accent: #f07a30; --accent-ink: #1a1a1a; --scene: #202327; --grass: #4f6b3a; color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.45; }
+  .app { display: grid; grid-template-columns: 1fr 320px; height: 100%; min-height: 0; }
+  .viewer { position: relative; min-width: 0; min-height: 0; }
+  canvas { display: block; width: 100%; height: 100%; outline: none; }
+  .hud { position: absolute; left: 16px; top: 16px; display: flex; flex-direction: column; gap: 10px; max-width: calc(100% - 32px); pointer-events: none; }
+  .hud h1 { font-family: var(--display); font-weight: 700; font-size: 20px; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+  .hud .sub { color: var(--muted); font-size: 12px; margin: 0; }
+  .toolbar { position: absolute; left: 16px; bottom: 16px; right: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+  .group .lbl { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding-right: 4px; }
+  button { font: 500 12px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  input[type=range] { accent-color: var(--accent); width: 140px; }
+  .side { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding-block: 18px; padding-inline: 18px; min-width: 0; }
+  .side h2 { font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0 0 10px; }
+  .side section + section { margin-top: 22px; }
+  dl.specs { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-variant-numeric: tabular-nums; }
+  dl.specs dt { color: var(--muted); }
+  dl.specs dd { margin: 0; font-family: var(--mono); font-size: 12.5px; min-width: 0; }
+  ul.parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  ul.parts li { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; padding: 7px 8px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+  ul.parts li:hover, ul.parts li.active { border-color: var(--accent); }
+  ul.parts li .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); }
+  ul.parts li .nm { min-width: 0; }
+  ul.parts li .nm small { display: block; color: var(--muted); font-size: 11.5px; }
+  ul.parts li .qty { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .note { color: var(--muted); font-size: 12.5px; margin: 10px 0 0; }
+  @media (max-width: 820px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 62vh 1fr; }
+    .side { border-left: 0; border-top: 1px solid var(--line); }
+    .hud h1 { font-size: 17px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <div class="viewer">
+    <canvas id="c" tabindex="0" aria-label="3D model of ClaudeBot. Drag to orbit, scroll to zoom."></canvas>
+    <div class="hud">
+      <h1>ClaudeBot, outdoor patrol robot</h1>
+      <p class="sub">Drag to orbit, scroll to zoom, right-drag to pan. Dimensions in mm, PETG and TPU parts.</p>
+    </div>
+    <div class="toolbar">
+      <div class="group"><span class="lbl">View</span>
+        <button id="v-iso" aria-pressed="true">3/4</button><button id="v-front">Front</button><button id="v-side">Side</button><button id="v-top">Top</button>
+      </div>
+      <div class="group"><span class="lbl">Show</span>
+        <button id="t-shell" aria-pressed="true">Body shell</button>
+        <button id="t-person" aria-pressed="true">Scale figure</button>
+        <button id="t-dock" aria-pressed="true">Dock</button>
+        <button id="t-spin" aria-pressed="false">Auto-rotate</button>
+      </div>
+      <div class="group"><label class="lbl" for="explode">Explode</label><input id="explode" type="range" min="0" max="1" step="0.01" value="0"></div>
+      <div class="group"><label class="lbl" for="swing">Caster swing</label><input id="swing" type="range" min="-180" max="180" step="1" value="0"></div>
+    </div>
+  </div>
+  <aside class="side">
+    <section>
+      <h2>Overall</h2>
+      <dl class="specs">
+        <dt>Length</dt><dd>700 mm (body + bumper)</dd>
+        <dt>Width</dt><dd>570 mm (over caster towers)</dd>
+        <dt>Height</dt><dd>1020 mm (to camera head)</dd>
+        <dt>Drive wheels</dt><dd>2 x 300 x 80 mm, 404 mm track</dd>
+        <dt>Casters</dt><dd>2 x 280 x 100 mm (11x4.00-5 mower size)</dd>
+        <dt>Caster trail</dt><dd>50 mm</dd>
+        <dt>Wheelbase</dt><dd>440 mm</dd>
+        <dt>Ground clearance</dt><dd>90 mm chassis, 290 mm canopy</dd>
+        <dt>Est. weight</dt><dd>17 kg</dd>
+        <dt>Top speed</dt><dd>1.0 m/s (capped)</dd>
+        <dt>Battery</dt><dd>12.8 V 20 Ah, ~3 h</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Printed parts</h2>
+      <ul class="parts" id="parts"></ul>
+      <p class="note">Click a part to highlight it. The exploded view lifts the canopy, deck and sensors apart. The caster swing slider shows the tires turning under the front boom, which is why the low chassis stops behind them.</p>
+    </section>
+    <section>
+      <h2>Bought parts</h2>
+      <dl class="specs">
+        <dt>Motors</dt><dd>2 x goBILDA 5203 71.2:1</dd>
+        <dt>Controller</dt><dd>RoboClaw 2x15A</dd>
+        <dt>Brain</dt><dd>Raspberry Pi 5</dd>
+        <dt>Depth cam</dt><dd>OAK-D Pro W</dd>
+        <dt>GPS</dt><dd>ZED-F9P RTK</dd>
+        <dt>Bearings</dt><dd>6806 (drive), 6004 + 51104 (spindle), 608 (caster axle)</dd>
+        <dt>Caster spindle</dt><dd>M12 bolt core</dd>
+      </dl>
+    </section>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+  // Key dimensions (mm). Mirrors what params.py will hold.
+  // Layout follows a zero-turn mower: a low chassis at the rear holds the battery and drive motors,
+  // and a raised front boom above tire height carries the caster spindles, so the big caster tires
+  // can swing a full circle underneath it without hitting the body.
+  const P = {
+    chassisRear: -280, chassisFront: 70, W: 300, H: 80, clearance: 90,
+    wheelD: 300, wheelW: 80, track: 404, axleX: -160,
+    // Front casters match an 11x4.00-5 zero-turn mower caster: 280 mm tire, 100 mm wide, 127 mm rim.
+    casterX: 280, casterZ: 200, casterD: 280, casterW: 100, casterRimD: 127, casterTrail: 50,
+    boomY: 300, boomH: 40, spindleH: 110,
+    deckT: 8, mastH: 400, mastR: 20, mastX: -190,
+  };
+  const chassisL = P.chassisFront - P.chassisRear, chassisCX = (P.chassisFront + P.chassisRear) / 2;
+  const chassisBottom = P.clearance, chassisTop = P.clearance + P.H;
+  const upperDeckY = P.boomY; // top deck plate sits level with the boom
+  const spindleBottom = P.boomY, spindleTop = P.boomY + P.spindleH;
+
+  // Material colors: graphite PETG structure, orange PETG shell, black TPU tires, sensor housings.
+  const C = {
+    petg: 0x3a3d42, shell: 0xe0601a, tpu: 0x15161a, deck: 0x4a4e55, enclosure: 0x2c2f34,
+    battery: 0x2f5a8c, metal: 0x9aa0a8, lens: 0x0e1a2a, red: 0xc8201a, yellow: 0xf2c200,
+    white: 0xf0efe9, copper: 0xb87333, person: 0x8f949b, dock: 0x565a60,
+  };
+  function mat(color, opts) { return new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.6, metalness: 0.05 }, opts || {})); }
+  const metal = () => mat(C.metal, { metalness: 0.7, roughness: 0.3 });
+
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 10, 20000);
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.target.set(0, 320, 0);
+  controls.enableDamping = true;
+  controls.maxPolarAngle = Math.PI / 2 - 0.02;
+  controls.minDistance = 400; controls.maxDistance = 6000;
+
+  // Lights
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x556644, 0.55));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+  sun.position.set(900, 1400, 700);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  const sc = sun.shadow.camera; sc.left = -1800; sc.right = 1800; sc.top = 1800; sc.bottom = -1800; sc.near = 100; sc.far = 5000;
+  scene.add(sun);
+
+  // Ground: lawn with a faint 100 mm grid.
+  const groundMat = mat(C.petg, { roughness: 1 });
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), groundMat);
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  const grid = new THREE.GridHelper(4000, 40, 0x000000, 0x000000);
+  grid.material.transparent = true; grid.material.opacity = 0.12; grid.position.y = 0.5; scene.add(grid);
+
+  // ---------- Part registry (for the sidebar + highlighting) ----------
+  const parts = [];
+  function part(name, qty, material, color, explode) {
+    const g = new THREE.Group();
+    const p = { name, qty, material, color, group: g, meshes: [], explode: explode || new THREE.Vector3() };
+    parts.push(p); return p;
+  }
+  function add(p, geo, m, pos, rot, parent) {
+    const mesh = new THREE.Mesh(geo, m);
+    if (pos) mesh.position.set(pos[0], pos[1], pos[2]);
+    if (rot) mesh.rotation.set(rot[0], rot[1], rot[2]);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    (parent || p.group).add(mesh); p.meshes.push(mesh); return mesh;
+  }
+  const robot = new THREE.Group(); scene.add(robot);
+  const box = (x, y, z) => new THREE.BoxGeometry(x, y, z);
+  const cyl = (r, h, seg, open) => new THREE.CylinderGeometry(r, r, h, seg || 48, 1, !!open);
+
+  function roundedRectShape(w, h, r) {
+    const s = new THREE.Shape();
+    const x = -w / 2, y = -h / 2;
+    s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+    s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+    s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+    return s;
+  }
+  // Rounded slab: footprint w (x) by d (z), height h, bottom at y0.
+  function slab(p, w, d, h, r, cx, y0, m) {
+    const g = new THREE.ExtrudeGeometry(roundedRectShape(w, d, r), { depth: h - 20, bevelEnabled: true, bevelSize: 10, bevelThickness: 10, bevelSegments: 4, curveSegments: 16 });
+    return add(p, g, m, [cx, y0 + 10, 0], [-Math.PI / 2, 0, 0]);
+  }
+
+  // ---------- Low chassis: four ribbed modules joined by flanges ----------
+  const chassis = part('Chassis modules', 4, 'PETG', C.petg);
+  const mL = chassisL / 2, mW = P.W / 2;
+  [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([sx, sz]) => {
+    add(chassis, box(mL - 4, P.H, mW - 4), mat(C.petg), [chassisCX + sx * mL / 2, chassisBottom + P.H / 2, sz * mW / 2]);
+  });
+  add(chassis, box(chassisL, P.H - 10, 10), mat(C.deck), [chassisCX, chassisBottom + P.H / 2, 0]);
+  add(chassis, box(10, P.H - 10, P.W), mat(C.deck), [chassisCX, chassisBottom + P.H / 2, 0]);
+
+  // ---------- Battery (bought) on the chassis lid under the deck, just ahead of the drive axle ----------
+  const battery = part('Battery tray', 1, 'PETG', C.battery);
+  add(battery, box(180, 75, 150), mat(C.battery), [-100, chassisTop + 4 + 37.5, 0]);
+
+  // ---------- Front boom: risers, deck frame and caster spindle towers ----------
+  const boom = part('Front boom + spindle towers', 1, 'PETG, 6 pieces', C.petg);
+  const riserH = P.boomY - chassisTop;
+  [1, -1].forEach(sz => add(boom, box(50, riserH, 40), mat(C.petg), [P.chassisFront - 30, chassisTop + riserH / 2, sz * 120]));
+  [1, -1].forEach(sz => add(boom, box(30, riserH - 10, 30), mat(C.petg), [P.chassisFront - 110, chassisTop + riserH / 2, sz * 120], [0, 0, -0.5])); // braces
+  const armL = P.casterX + 40 - (P.chassisFront - 60);
+  [1, -1].forEach(sz => add(boom, box(armL, P.boomH, 40), mat(C.petg), [P.chassisFront - 60 + armL / 2, P.boomY + P.boomH / 2, sz * P.casterZ]));
+  add(boom, box(40, P.boomH, P.casterZ * 2 + 40), mat(C.petg), [P.casterX, P.boomY + P.boomH / 2, 0]);
+  add(boom, box(40, P.boomH, P.casterZ * 2 + 40), mat(C.petg), [P.chassisFront - 40, P.boomY + P.boomH / 2, 0]);
+  [1, -1].forEach(sz => {
+    add(boom, cyl(34, P.spindleH), mat(C.petg), [P.casterX, spindleBottom + P.spindleH / 2, sz * P.casterZ]); // 6004 top + bottom, 51104 thrust
+    add(boom, cyl(44, 10), mat(C.deck), [P.casterX, spindleTop + 5, sz * P.casterZ]);
+  });
+
+  // ---------- Upper deck plate (two halves) ----------
+  const deck = part('Upper deck plate', 2, 'PETG', C.deck, new THREE.Vector3(0, 140, 0));
+  const deckRear = P.chassisRear + 10, deckFront = P.casterX - 60;
+  add(deck, box(deckFront - deckRear, P.deckT, P.W + 40), mat(C.deck), [(deckFront + deckRear) / 2, upperDeckY + P.boomH - P.deckT / 2, 0]);
+  // Rear deck legs down to the chassis
+  [1, -1].forEach(sz => add(deck, box(40, riserH, 30), mat(C.deck), [P.chassisRear + 40, chassisTop + riserH / 2, sz * 130]));
+  const deckTop = upperDeckY + P.boomH;
+
+  // ---------- Drive axle housings + motors ----------
+  const axle = part('Drive axle housings', 2, 'PETG', C.petg);
+  const wheelY = P.wheelD / 2;
+  [1, -1].forEach(sz => {
+    add(axle, cyl(42, 60), mat(C.petg), [P.axleX, wheelY, sz * (P.W / 2 + 30)], [Math.PI / 2, 0, 0]);
+    add(axle, cyl(18, 120), metal(), [P.axleX, wheelY, sz * (P.W / 2 - 60)], [Math.PI / 2, 0, 0]);
+  });
+
+  // ---------- Drive wheels: spoked hub + rim, TPU turf tread ----------
+  const wheels = part('Drive wheel hubs', 2, 'PETG', C.petg);
+  const treads = part('Drive tire treads', 2, 'TPU 95A', C.tpu);
+  const wheelSide = [];
+  [1, -1].forEach(sz => {
+    const g = new THREE.Group(); g.position.set(P.axleX, wheelY, sz * P.track / 2); wheels.group.add(g); wheelSide.push([g, sz]);
+    add(wheels, new THREE.TorusGeometry(P.wheelD / 2 - 24, 10, 16, 64), mat(C.petg), null, null, g);
+    add(wheels, cyl(55, P.wheelW - 10), mat(C.petg), null, [Math.PI / 2, 0, 0], g);
+    for (let i = 0; i < 6; i++) {
+      const a = i * Math.PI / 3;
+      add(wheels, box(P.wheelD / 2 - 40, 14, 40), mat(C.petg), [Math.cos(a) * (P.wheelD / 4 - 8), Math.sin(a) * (P.wheelD / 4 - 8), 0], [0, 0, a], g);
+    }
+    const tg = new THREE.Group(); tg.position.copy(g.position); treads.group.add(tg); wheelSide.push([tg, sz]);
+    add(treads, cyl(P.wheelD / 2, P.wheelW, 72), mat(C.tpu, { roughness: 0.95 }), null, [Math.PI / 2, 0, 0], tg);
+    for (let i = 0; i < 24; i++) {
+      const a = i * Math.PI / 12;
+      add(treads, box(14, 4, P.wheelW - 8), mat(0x24262b, { roughness: 1 }), [Math.cos(a) * (P.wheelD / 2 + 1), Math.sin(a) * (P.wheelD / 2 + 1), 0], [0, 0, a], tg);
+    }
+  });
+
+  // ---------- Front casters: zero-turn mower style ----------
+  // Vertical spindle in the tower, yoke fork straddling the tire, 50 mm trail. The swing group pivots
+  // about the spindle so the slider can show the full sweep.
+  const casterFork = part('Caster forks (yokes)', 2, 'PETG', C.petg, new THREE.Vector3(0, -150, 0));
+  const casterWheel = part('Caster wheels + tires', 4, 'PETG + TPU', C.tpu, new THREE.Vector3(0, -150, 0));
+  const swingGroups = [];
+  [1, -1].forEach(sz => {
+    const pivot = new THREE.Vector3(P.casterX, 0, sz * P.casterZ);
+    const fg = new THREE.Group(); fg.position.copy(pivot); casterFork.group.add(fg);
+    const wg = new THREE.Group(); wg.position.copy(pivot); casterWheel.group.add(wg);
+    swingGroups.push(fg, wg);
+    // Spindle: printed sleeve on an M12 bolt core
+    add(casterFork, cyl(10, P.spindleH + 40), metal(), [0, spindleBottom + P.spindleH / 2 + 8, 0], null, fg);
+    add(casterFork, cyl(12, 8, 6), metal(), [0, spindleTop + 22, 0], null, fg);
+    // Yoke crown under the spindle, legs straddling the tire, M8 axle through 608 bearings
+    const wx = -P.casterTrail, wy = P.casterD / 2;
+    add(casterFork, box(P.casterTrail + 70, 14, P.casterW + 40), mat(C.petg), [-P.casterTrail / 2 + 5, spindleBottom - 12, 0], null, fg);
+    const legH = spindleBottom - 19 - wy + 20;
+    [1, -1].forEach(s2 => add(casterFork, box(44, legH, 12), mat(C.petg), [wx, wy - 20 + legH / 2, s2 * (P.casterW / 2 + 14)], null, fg));
+    add(casterFork, cyl(6, P.casterW + 60), metal(), [wx, wy, 0], [Math.PI / 2, 0, 0], fg);
+    // Wheel: printed rim + hub, TPU tire with a smooth turf profile
+    add(casterWheel, cyl(P.casterRimD / 2, P.casterW - 20, 40), mat(C.petg), [wx, wy, 0], [Math.PI / 2, 0, 0], wg);
+    add(casterWheel, cyl(30, P.casterW - 8, 32), mat(C.petg), [wx, wy, 0], [Math.PI / 2, 0, 0], wg);
+    add(casterWheel, cyl(P.casterD / 2, P.casterW, 64), mat(C.tpu, { roughness: 0.95 }), [wx, wy, 0], [Math.PI / 2, 0, 0], wg);
+    for (let i = 0; i < 16; i++) {
+      const a = i * Math.PI / 8;
+      add(casterWheel, box(12, 3, P.casterW - 10), mat(0x24262b, { roughness: 1 }), [wx + Math.cos(a) * (P.casterD / 2 + 1), wy + Math.sin(a) * (P.casterD / 2 + 1), 0], [0, 0, a], wg);
+    }
+  });
+
+  // ---------- Electronics enclosure on the upper deck ----------
+  const enclosure = part('Electronics enclosure', 2, 'PETG + TPU gasket', C.enclosure, new THREE.Vector3(0, 260, 0));
+  const encH = 100, encX = -40;
+  add(enclosure, box(250, encH, 190), mat(C.enclosure), [encX, deckTop + encH / 2, 0]);
+  add(enclosure, box(258, 10, 198), mat(C.deck), [encX, deckTop + encH + 5, 0]);
+  add(enclosure, box(254, 3, 194), mat(C.tpu), [encX, deckTop + encH + 0.5, 0]);
+  [-50, 0, 50].forEach(z => add(enclosure, cyl(8, 14), mat(C.tpu), [encX - 125 - 7, deckTop + 40, z], [0, 0, Math.PI / 2]));
+
+  // ---------- Body shell: lower hull around the chassis, canopy over the deck and casters ----------
+  const shell = part('Body shell panels', 7, 'PETG', C.shell, new THREE.Vector3(0, 420, 0));
+  const hullW = P.W + 30, hullL = chassisL + 20, hullCX = chassisCX - 5;
+  slab(shell, hullL, hullW, P.boomY - chassisBottom + 2, 60, hullCX, chassisBottom - 4, mat(C.shell, { roughness: 0.5 }));
+  const canopyRear = P.chassisRear - 15, canopyFront = P.casterX + 55, canopyW = P.W + 60;
+  const canopyBottom = P.boomY - 8, canopyTop = deckTop + encH + 40;
+  slab(shell, canopyFront - canopyRear, canopyW, canopyTop - canopyBottom, 70, (canopyFront + canopyRear) / 2, canopyBottom, mat(C.shell, { roughness: 0.5 }));
+  for (let i = 0; i < 5; i++) [1, -1].forEach(sz => add(shell, box(40, 4, 4), mat(C.enclosure), [-120 + i * 25, canopyTop - 50, sz * (canopyW / 2 + 9)]));
+  const topSurf = canopyTop + 10;
+  const fenders = part('Rear wheel fenders', 2, 'PETG', C.shell, new THREE.Vector3(0, 420, 0));
+  [1, -1].forEach(sz => {
+    const f = new THREE.Mesh(new THREE.CylinderGeometry(P.wheelD / 2 + 22, P.wheelD / 2 + 22, P.wheelW + 24, 48, 1, true, 0, Math.PI), mat(C.shell, { side: THREE.DoubleSide }));
+    f.position.set(P.axleX, wheelY, sz * P.track / 2); f.rotation.set(Math.PI / 2, 0, 0);
+    f.castShadow = true; fenders.group.add(f); fenders.meshes.push(f);
+  });
+
+  // ---------- Front bumper on the canopy nose, above the caster tires ----------
+  const bumper = part('Front bumper', 1, 'PETG + TPU skin', C.tpu, new THREE.Vector3(120, 0, 0));
+  const bx = canopyFront + 20, by = canopyBottom + 45;
+  add(bumper, box(24, 70, canopyW - 60), mat(C.tpu, { roughness: 0.95 }), [bx, by, 0]);
+  [1, -1].forEach(sz => add(bumper, cyl(35, 70), mat(C.tpu, { roughness: 0.95 }), [bx - 11, by, sz * (canopyW / 2 - 30)]));
+
+  // ---------- OAK-D depth camera on the nose, angled 10 degrees down, with rain hood ----------
+  const oak = part('Depth camera mount + hood', 1, 'PETG', C.enclosure, new THREE.Vector3(140, 0, 0));
+  const oakG = new THREE.Group(); oakG.position.set(canopyFront + 6, canopyTop - 40, 0); oakG.rotation.z = -THREE.MathUtils.degToRad(10);
+  const oakBody = new THREE.Mesh(box(28, 36, 112), mat(0x1f2124)); oakBody.castShadow = true; oakG.add(oakBody);
+  [-40, 0, 40].forEach(z => { const l = new THREE.Mesh(cyl(8, 4, 24), mat(C.lens, { metalness: 0.4, roughness: 0.2 })); l.rotation.z = Math.PI / 2; l.position.set(15, 0, z); oakG.add(l); });
+  const hood = new THREE.Mesh(box(50, 6, 130), mat(C.enclosure)); hood.position.set(8, 26, 0); hood.castShadow = true; oakG.add(hood);
+  oak.group.add(oakG); oak.meshes.push(oakBody, hood);
+
+  // ---------- Sensor mast + pan-tilt head + GPS ----------
+  const mast = part('Sensor mast segments', 2, 'PETG', C.petg, new THREE.Vector3(0, 520, 0));
+  const mastBase = topSurf - 2;
+  add(mast, cyl(40, 14), mat(C.petg), [P.mastX, mastBase + 7, 0]);
+  for (let i = 0; i < 2; i++) add(mast, cyl(P.mastR, P.mastH / 2 - 2), mat(i % 2 ? C.deck : C.petg), [P.mastX, mastBase + 14 + P.mastH / 4 + i * P.mastH / 2, 0]);
+  const mastTop = mastBase + 14 + P.mastH;
+
+  const head = part('Pan-tilt camera head', 1, 'PETG + clear window', C.enclosure, new THREE.Vector3(0, 560, 0));
+  add(head, cyl(26, 18), mat(C.enclosure), [P.mastX, mastTop + 9, 0]);
+  const tilt = new THREE.Group(); tilt.position.set(P.mastX, mastTop + 50, 0); tilt.rotation.z = -THREE.MathUtils.degToRad(12);
+  const hb = new THREE.Mesh(box(60, 50, 64), mat(C.enclosure)); hb.castShadow = true; tilt.add(hb);
+  const win = new THREE.Mesh(box(3, 34, 50), mat(0x9fc5e8, { transparent: true, opacity: 0.55, roughness: 0.1 })); win.position.set(31, 0, 0); tilt.add(win);
+  const ir = new THREE.Mesh(cyl(9, 4, 20), mat(0x2a0a0a)); ir.rotation.z = Math.PI / 2; ir.position.set(31, 10, -16); tilt.add(ir);
+  [1, -1].forEach(s => { const arm = new THREE.Mesh(box(10, 46, 6), mat(C.enclosure)); arm.position.set(-20, -14, s * 36); tilt.add(arm); });
+  head.group.add(tilt); head.meshes.push(hb, win);
+
+  const gps = part('GPS antenna mount', 1, 'PETG', C.white, new THREE.Vector3(0, 640, 0));
+  add(gps, cyl(45, 3), metal(), [P.mastX, mastTop + 92, 0]);
+  add(gps, cyl(30, 14), mat(C.white), [P.mastX, mastTop + 101, 0]);
+  add(gps, box(8, 14, 8), mat(C.enclosure), [P.mastX, mastTop + 86, 0]);
+
+  // ---------- Rear deck: E-stop, charge port, light bar ----------
+  const rear = part('E-stop, charge port, light bar', 3, 'PETG', C.yellow, new THREE.Vector3(0, 420, 0));
+  const rx = canopyRear + 45;
+  add(rear, cyl(22, 10), mat(C.yellow), [rx, topSurf + 5, 70]);
+  add(rear, cyl(18, 22), mat(C.red), [rx, topSurf + 21, 70]);
+  add(rear, box(36, 12, 44), mat(C.enclosure), [rx, topSurf + 6, -70]);
+  [1, -1].forEach(s => add(rear, box(20, 4, 10), mat(C.copper, { metalness: 0.8, roughness: 0.3 }), [P.chassisRear - 7, chassisBottom + 30, s * 50]));
+  add(rear, box(16, 14, 180), mat(C.enclosure), [canopyRear + 8, topSurf + 7, 0]);
+  add(rear, box(4, 8, 170), mat(0xfff1c2, { emissive: 0xffd27a, emissiveIntensity: 0.6 }), [canopyRear - 1, topSurf + 7, 0]);
+
+  parts.forEach(p => robot.add(p.group));
+
+  // ---------- Charging dock ----------
+  const dockG = new THREE.Group(); dockG.position.set(-1250, 0, 0); scene.add(dockG);
+  const dockParts = part('Charging dock', 4, 'PETG', C.dock);
+  const dm = mat(C.dock);
+  add(dockParts, box(560, 14, 660), dm, [0, 7, 0]);
+  [1, -1].forEach(s => add(dockParts, box(440, 40, 20), dm, [40, 34, s * 265], [0, s * 0.1, 0]));
+  add(dockParts, box(40, 120, 180), dm, [-240, 74, 0]);
+  [1, -1].forEach(s => add(dockParts, box(24, 6, 12), mat(C.copper, { metalness: 0.8, roughness: 0.3 }), [-216, chassisBottom + 30, s * 50]));
+  add(dockParts, box(90, 6, 220), dm, [-235, 150, 0]);
+  robot.remove(dockParts.group); dockG.add(dockParts.group);
+
+  // ---------- Scale figure, 1.75 m ----------
+  const person = new THREE.Group(); person.position.set(550, 0, 700); scene.add(person);
+  const pm = mat(C.person, { roughness: 0.9 });
+  const legs = new THREE.Mesh(cyl(90, 800, 24), pm); legs.position.y = 400; person.add(legs);
+  const torso = new THREE.Mesh(cyl(130, 620, 24), pm); torso.position.y = 1110; person.add(torso);
+  const headM = new THREE.Mesh(new THREE.SphereGeometry(110, 24, 16), pm); headM.position.y = 1640; person.add(headM);
+  person.children.forEach(m => { m.castShadow = true; });
+
+  // ---------- Sidebar: parts list ----------
+  const list = document.getElementById('parts');
+  let active = null;
+  parts.forEach(p => {
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="sw"></span><span class="nm">' + p.name + '<small>' + p.material + '</small></span><span class="qty">x' + p.qty + '</span>';
+    li.querySelector('.sw').style.background = '#' + p.color.toString(16).padStart(6, '0');
+    li.addEventListener('click', () => setActive(active === p ? null : p));
+    p.li = li; list.appendChild(li);
+  });
+  function setActive(p) {
+    parts.forEach(q => {
+      q.li.classList.toggle('active', q === p);
+      q.meshes.forEach(m => {
+        const mt = m.material; if (!mt.emissive) return;
+        if (mt.userData.e0 === undefined) { mt.userData.e0 = mt.emissive.getHex(); mt.userData.i0 = mt.emissiveIntensity; }
+        mt.emissive.setHex(q === p ? 0xe0601a : mt.userData.e0); mt.emissiveIntensity = q === p ? 0.45 : mt.userData.i0;
+      });
+    });
+    active = p;
+  }
+
+  // ---------- Toggles and views ----------
+  function toggle(id, fn) {
+    const b = document.getElementById(id);
+    b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); fn(on); });
+  }
+  toggle('t-shell', on => { shell.group.visible = on; fenders.group.visible = on; });
+  toggle('t-person', on => { person.visible = on; });
+  toggle('t-dock', on => { dockG.visible = on; });
+  toggle('t-spin', on => { controls.autoRotate = on; });
+  controls.autoRotateSpeed = 1.2;
+
+  const views = { 'v-iso': [1700, 1000, 1700], 'v-front': [2500, 420, 0], 'v-side': [0, 420, 2500], 'v-top': [1, 2900, 0] };
+  const viewButtons = Object.keys(views).map(id => document.getElementById(id));
+  function setView(id) {
+    const v = views[id]; camera.position.set(v[0], v[1], v[2]); controls.target.set(0, id === 'v-top' ? 0 : 320, 0); controls.update();
+    viewButtons.forEach(b => b.setAttribute('aria-pressed', String(b.id === id)));
+  }
+  viewButtons.forEach(b => b.addEventListener('click', () => setView(b.id)));
+  setView('v-iso');
+
+  // Exploded view: each part slides along its own explode vector; drive wheels push outward.
+  const explodeEl = document.getElementById('explode');
+  function applyExplode() {
+    const t = parseFloat(explodeEl.value);
+    parts.forEach(p => { p.group.position.copy(p.explode).multiplyScalar(t); });
+    wheelSide.forEach(([g, sz]) => { g.position.z = sz * (P.track / 2 + 160 * t); });
+    axle.meshes.forEach(m => { if (m.userData.z0 === undefined) m.userData.z0 = m.position.z; m.position.z = m.userData.z0 + Math.sign(m.userData.z0) * 60 * t; });
+  }
+  explodeEl.addEventListener('input', applyExplode);
+
+  // Caster swing: rotate both forks about their spindles.
+  const swingEl = document.getElementById('swing');
+  swingEl.addEventListener('input', () => { const a = THREE.MathUtils.degToRad(parseFloat(swingEl.value)); swingGroups.forEach(g => { g.rotation.y = a; }); });
+
+  // ---------- Theme-aware scene colors ----------
+  function applyTheme() {
+    const cs = getComputedStyle(document.documentElement);
+    scene.background = new THREE.Color(cs.getPropertyValue('--scene').trim());
+    groundMat.color.set(cs.getPropertyValue('--grass').trim());
+    scene.fog = new THREE.Fog(scene.background, 3500, 8000);
+  }
+  applyTheme();
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // ---------- Resize + render loop ----------
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.floor(w * renderer.getPixelRatio()) || canvas.height !== Math.floor(h * renderer.getPixelRatio())) {
+      renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+  }
+  function loop() { resize(); controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); }
+  loop();
+})();
+</script>

@@ -1,0 +1,69 @@
+module,part,qty,material,x_mm,y_mm,z_mm,volume_cm3,fits_h2c,walls,infill_pct,supports,orientation,notes
+chassis,chassis_module_rear_left,1,PETG,175.0,150.0,90.0,540.7,yes,5,30,no,open top up,Open tray. Seam walls bolt to the neighbour with M5 x 20 and nuts; 6 mm dowels locate them.
+chassis,chassis_module_rear_right,1,PETG,175.0,150.0,90.0,540.7,yes,5,30,no,open top up,Open tray. Seam walls bolt to the neighbour with M5 x 20 and nuts; 6 mm dowels locate them.
+chassis,chassis_module_front_left,1,PETG,175.0,150.0,90.0,533.4,yes,5,30,no,open top up,Open tray. Seam walls bolt to the neighbour with M5 x 20 and nuts; 6 mm dowels locate them.
+chassis,chassis_module_front_right,1,PETG,175.0,150.0,90.0,533.4,yes,5,30,no,open top up,Open tray. Seam walls bolt to the neighbour with M5 x 20 and nuts; 6 mm dowels locate them.
+chassis,chassis_lid_rear,1,PETG,175.0,300.0,14.0,323.6,yes,4,30,no,"flat, ribs up",Bolts to the rear modules with M4 x 12. Legs bolt into the M5 inserts.
+chassis,chassis_lid_front,1,PETG,175.0,300.0,14.0,325.9,yes,4,30,no,"flat, ribs up",Bolts to the front modules with M4 x 12. Risers and braces bolt into the M5 inserts.
+chassis,battery_tray,1,PETG,192.0,182.0,20.0,169.4,yes,3,20,no,as modelled (Z up),"Sits on the chassis lid under the deck, just ahead of the axle. 2x M4 into the lid inserts, two 25 mm straps."
+chassis,alignment_dowel,16,PETG,6.0,6.0,16.0,0.4,yes,3,100,no,as modelled (Z up),6 x 16 mm. Print standing up.
+drivetrain,drive_axle_housing,2,PETG,70.0,60.0,85.0,125.4,yes,6,60,no,flange down,"Flange bolts to the rear module outer wall with 4x M5 x 35 (heads in the counterbores, nuts on the motor mount inside). Fit before the wheel. Tube carries both 6808 bearings."
+drivetrain,motor_mount_bracket,2,PETG,70.0,60.0,16.0,37.9,yes,5,40,no,plate down,Inside the chassis. Shares the M5 bolts with the axle housing. 4x M4 x 16 bolt the motor face through the standoff; the clamping coupler sits inside the housing's 20 mm bore.
+drivetrain,drive_wheel,2,PETG,290.0,290.0,80.0,1275.0,yes,4,25,no,inner face down,284 mm rim and hub in one piece. Press both 6808 bearings in from the inner (flat) face with the spacer between them. goBILDA REX hub bolts to the outer web.
+drivetrain,bearing_spacer,2,PETG,51.5,51.5,59.4,37.5,yes,4,100,no,as modelled (Z up),Sits between the two 6808 bearings inside the hub.
+drivetrain,drive_tread,2,TPU 95A,300.0,300.0,80.0,524.5,yes,3,20,no,flat,Stretch over the rim; the three grooves snap onto the rim ribs. Print with 3 walls and 20 percent gyroid.
+casters,caster_spindle_tower,2,PETG,100.0,100.0,110.0,314.5,yes,6,50,no,flange down,"Sits on the boom arm pad, 4x M6 x 50 down into the pad inserts. Press a 6004 bearing into each end."
+casters,caster_spindle_sleeve,2,PETG,34.6,30.0,160.0,33.3,yes,8,100,no,"standing, hex down",Hex boss drops into the yoke crown. M12 x 180 bolt runs up through it; nylock nut and washer on top of the tower.
+casters,caster_fork,2,PETG,130.0,156.0,187.0,534.1,yes,6,50,yes,on its side,Yoke with 50 mm trail. Print on its side (one leg on the bed) with supports so layers run along the legs. M8 x 140 axle bolt.
+casters,caster_rim,2,PETG,264.0,264.0,100.0,1395.7,yes,4,25,no,flat,258 mm rim. Press a 608 bearing into each end with the inner spacer between them.
+casters,caster_tire,2,TPU 95A,280.0,280.0,100.0,872.0,yes,3,15,no,flat,"280 x 100 mm. Stretch over the rim ribs. 3 walls, 15 percent gyroid for cushion."
+casters,caster_axle_spacer_inner,2,PETG,13.5,13.5,85.4,7.3,yes,4,100,no,as modelled (Z up),Between the two 608 inner races.
+casters,caster_axle_spacer_outer,4,PETG,16.0,16.0,9.5,1.4,yes,4,100,no,as modelled (Z up),Between each 608 and the fork leg.
+boom,boom_arm_left,1,PETG,310.0,100.0,40.0,328.2,yes,5,40,no,flat,"310 mm box section with the tower pad. Print flat, pad up. M6 x 50 tower bolts, M5 x 45 cross member bolts."
+boom,boom_arm_right,1,PETG,310.0,100.0,40.0,328.2,yes,5,40,no,flat,Mirror of the left arm.
+boom,boom_cross_front_half,2,PETG,185.0,40.0,40.0,143.1,yes,5,40,no,flat,Two halves lap at the center (turn one 180 degrees) with 2x M5 x 45 and nuts across the joint; the end plate bolts to the arm pad with 2x M5 x 16 through the pad wall.
+boom,boom_cross_rear_half,2,PETG,210.0,40.0,40.0,166.4,yes,5,40,no,flat,"Same as the front halves, plus riser inserts underneath."
+boom,riser_column,2,PETG,64.0,64.0,129.0,94.3,yes,5,40,no,foot down,"Bolt the risers to the rear cross member first (2x M5 x 20 up through the top plate, from inside the open column), then stand that subassembly on the lid and bolt the feet (4x M5 x 16)."
+boom,riser_brace,2,PETG,95.0,30.0,110.0,55.1,yes,4,30,no,flat,Gusset from the lid to the riser rear face. Print flat on its side.
+boom,rear_deck_leg,2,PETG,64.0,54.0,169.0,100.6,yes,5,40,no,foot down,Chassis lid to upper deck. Foot: 4x M5 x 16. Deck bolts into the top inserts.
+boom,deck_front_left,1,PETG,315.0,175.0,24.0,330.2,yes,4,30,no,ribs up (flipped),Ribbed plate. Print ribs up (flip the model). M4 insert grid on 40 mm for mounting.
+boom,deck_front_right,1,PETG,315.0,145.0,24.0,291.9,yes,4,30,no,ribs up (flipped),Ribbed plate. Print ribs up (flip the model). M4 insert grid on 40 mm for mounting.
+boom,deck_rear_left,1,PETG,285.0,175.0,24.0,323.3,yes,4,30,no,ribs up (flipped),Ribbed plate. Print ribs up (flip the model). M4 insert grid on 40 mm for mounting.
+boom,deck_rear_right,1,PETG,285.0,145.0,24.0,285.1,yes,4,30,no,ribs up (flipped),Ribbed plate. Print ribs up (flip the model). M4 insert grid on 40 mm for mounting.
+enclosure,enclosure_tub,1,PETG,266.0,226.0,80.0,518.5,yes,4,25,no,open top up,"4x M4 x 12 feet bolts into the deck grid. Pi 5 on M2.5 inserts, other boards on the M3 grid via adapter plates. Fit PG9 glands."
+enclosure,enclosure_lid,1,PETG,258.0,198.0,13.0,406.1,yes,4,25,no,"flat, ribs up",8x M4 x 16 into the tub bosses. Gasket sits in the groove.
+enclosure,enclosure_gasket,1,TPU 95A,249.6,189.6,2.6,8.1,yes,2,100,no,flat,"Press into the lid groove. 2 walls, 100 percent."
+shell,skirt_rear,1,PETG,300.0,16.5,127.0,143.7,yes,3,20,no,flat on its back,Bolts to the rear lid edge inserts (3x M4). Canopy screws into the top tabs.
+shell,skirt_front,1,PETG,300.0,16.5,127.0,134.5,yes,3,20,no,flat on its back,Between the risers; the bottom flange is gapped around the riser feet. Wire hole for the bumper loom.
+shell,skirt_side_rear,2,PETG,172.0,13.0,127.0,80.5,yes,3,20,no,flat on its back,One per side; mirror for the right side in the slicer. Fender bolts pass through the canopy into the bosses.
+shell,skirt_side_front,2,PETG,172.0,16.5,127.0,80.4,yes,3,20,no,flat on its back,One per side; mirror for the right side in the slicer. Fender bolts pass through the canopy into the bosses.
+shell,fender,2,PETG,304.5,104.0,101.2,178.3,yes,3,20,no,on its side,Half round over each drive wheel. 3x M4 into the skirt bosses. Print on its side (flange down).
+shell,canopy_front_left,1,PETG,310.0,153.5,170.0,326.1,yes,3,15,no,upside down,Print upside down (roof on the bed). Join with M3 x 10 screws through the seam tabs.
+shell,canopy_front_right,1,PETG,310.0,153.5,170.0,326.1,yes,3,15,no,upside down,Print upside down (roof on the bed). Join with M3 x 10 screws through the seam tabs.
+shell,canopy_rear_left,1,PETG,310.0,153.5,170.0,358.0,yes,3,15,no,upside down,Print upside down (roof on the bed). Join with M3 x 10 screws through the seam tabs.
+shell,canopy_rear_right,1,PETG,310.0,153.5,170.0,355.4,yes,3,15,no,upside down,Print upside down (roof on the bed). Join with M3 x 10 screws through the seam tabs.
+shell,canopy_splice_wall,4,PETG,120.0,30.0,7.0,14.6,yes,3,100,no,flat,"Inside the canopy across each wall seam, M3 x 8 screws from outside."
+shell,canopy_splice_roof_x,1,PETG,180.0,30.0,7.0,21.9,yes,3,100,no,flat,Inside the roof across the front/rear seam.
+shell,canopy_splice_roof_y,2,PETG,250.0,30.0,7.0,30.4,yes,3,100,no,flat,"Inside the roof along the left/right seam; one behind the mast, one ahead."
+shell,bumper_carrier,1,PETG,300.0,44.0,60.0,453.3,yes,4,30,no,as modelled (Z up),Slides on two M5 x 30 shoulder bolts in the canopy nose with 10 mm springs. Two subminiature microswitches.
+shell,bumper_skin,1,TPU 95A,304.0,13.7,70.0,145.9,yes,3,20,no,on its back,Clips over the carrier's front lips.
+shell,oak_mount,1,PETG,120.0,28.6,60.0,118.7,yes,4,40,no,as modelled (Z up),10 degree down wedge. Camera on the 1/4-20 and M4 slots; 2x M4 into the canopy nose.
+shell,oak_hood,1,PETG,136.0,50.0,36.0,58.6,yes,3,20,no,upside down,"Rain hood over the depth camera, 2x M4."
+mast,mast_standoff,1,PETG,100.0,80.0,96.0,132.1,yes,5,40,no,as modelled (Z up),"Deck grid to canopy roof. 4x M4 x 12 down into the deck, 4x M5 inserts on top for the mast base through the roof."
+mast,mast_base,1,PETG,90.0,90.0,38.0,62.0,yes,5,50,no,as modelled (Z up),"Sits on the canopy roof over the standoff. 4x M5 x 25. First tube slides over the spigot, M4 cross bolt."
+mast,mast_segment,2,PETG,40.0,40.0,230.0,106.4,yes,4,30,no,standing,200 mm tube with a 30 mm spigot. Print standing. M4 x 45 cross bolts.
+mast,pan_base,1,PETG,56.0,56.0,70.0,153.5,yes,4,30,no,as modelled (Z up),Top of the mast. Standard-size pan servo drops in from the top.
+mast,tilt_bracket,1,PETG,70.0,60.0,64.0,36.1,yes,4,30,yes,as modelled (Z up),"Bolts to the pan servo horn (25 mm pattern). Tilt servo in one arm, 6 mm pin on the other."
+mast,camera_housing,1,PETG,60.0,57.0,64.0,70.3,yes,3,20,yes,open back down,"Pi Camera Module 3 on M2 screws, IR LED in the side hole. Rear cover on 2x M3."
+mast,camera_cover,1,PETG,3.0,50.0,64.0,9.5,yes,3,20,no,flat,Rear cover for the camera housing.
+mast,camera_window,1,clear PETG,2.6,41.4,31.4,3.4,yes,2,100,no,flat,Press into the housing recess; seal with a bead of silicone.
+mast,gps_mount,1,PETG,89.5,71.0,68.0,46.2,yes,4,30,yes,as modelled (Z up),L bracket off the pan base rear face holding a 60 mm GPS puck. 2x M4.
+rear,estop_housing,1,PETG,76.0,76.0,45.0,56.0,yes,3,20,no,as modelled (Z up),22 mm mushroom E-stop. 4x M3 through the canopy roof.
+rear,charge_port_housing,1,PETG,26.0,80.0,60.0,73.6,yes,4,30,yes,as modelled (Z up),Rear face of the canopy. Two 10 x 30 mm spring pads face the dock.
+rear,light_bar_housing,1,PETG,180.0,16.0,14.0,18.3,yes,3,20,no,as modelled (Z up),12 mm LED strip plus a 12 mm buzzer. 2x M3 into the canopy rear face.
+rear,contact_pad_carrier,1,PETG,8.0,120.0,30.0,27.2,yes,3,30,no,as modelled (Z up),"Rear of the chassis, carries the two copper charge pads. 2x M4."
+dock,dock_tile,4,PETG,275.0,310.0,14.0,1014.9,yes,3,15,no,as modelled (Z up),275 x 310 floor tile with the lap tabs. Four tiles lap together with M5 x 20; 10 mm ground stakes at the corners.
+dock,dock_rail_half,4,PETG,240.0,40.0,40.0,161.6,yes,3,20,no,as modelled (Z up),Two halves per rail. Bolt to the tile inserts to funnel the caster tires.
+dock,dock_contact_block,1,PETG,80.0,160.0,150.0,256.1,yes,4,25,no,as modelled (Z up),Holds two spring contacts facing the robot's rear pads. Bolt to the tiles.
+dock,dock_rain_cover,1,PETG,100.0,220.0,65.0,126.5,yes,3,20,no,upside down,Over the contact block. Print upside down.
+dock,dock_tag_frame,1,PETG,140.0,140.0,36.0,77.5,yes,3,20,no,as modelled (Z up),Holds a 120 mm printed AprilTag for final docking alignment. Bolts to the rain cover posts.

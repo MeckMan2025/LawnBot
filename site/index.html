@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="ClaudeBot: a fully 3D-printed outdoor patrol robot. Every printed part in build order with an interactive 3D view, print settings and the bought-parts list.">
+<meta name="theme-color" content="#e0601a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>ClaudeBot Build Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: step list on the left, a 3D stage with the written step on the right; the part gallery runs below. */
+  :root {
+    --bg: #f3f1ec; --panel: #ffffff; --fg: #1d1f21; --muted: #65686d; --line: #d9d5cc;
+    --accent: #e0601a; --accent-ink: #ffffff; --scene: #e9e6df; --ghost: #9a9ea5; --new: #e0601a; --bought: #3f7fbf;
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191c; --panel: #1f2225; --fg: #eceae4; --muted: #9a9ea5; --line: #33373c;
+      --accent: #f07a30; --accent-ink: #1a1a1a; --scene: #202327; --ghost: #5c6168; --new: #f07a30; --bought: #5c9ad8; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191c; --panel: #1f2225; --fg: #eceae4; --muted: #9a9ea5; --line: #33373c;
+    --accent: #f07a30; --accent-ink: #1a1a1a; --scene: #202327; --ghost: #5c6168; --new: #f07a30; --bought: #5c9ad8; color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14.5px; line-height: 1.5; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding-block: 20px; padding-inline: 16px; }
+  header h1 { font-family: var(--display); font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; text-wrap: balance; }
+  header p { color: var(--muted); margin: 0 0 18px; max-width: 70ch; }
+  .layout { display: grid; grid-template-columns: 230px 1fr; gap: 18px; align-items: start; }
+  nav.steps { position: sticky; top: env(safe-area-inset-top, 0px); display: flex; flex-direction: column; gap: 4px; }
+  nav.steps button { text-align: left; display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; font: 500 13.5px var(--body); color: var(--fg); cursor: pointer; }
+  nav.steps button .n { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  nav.steps button[aria-current="step"] { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+  nav.steps button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .viewer { position: relative; height: 520px; background: var(--scene); }
+  .viewer canvas { display: block; width: 100%; height: 100%; }
+  .viewer .tools { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .viewer .legend { position: absolute; right: 12px; top: 12px; display: flex; gap: 10px; font-size: 12px; color: var(--muted); background: var(--panel); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .viewer .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-family: var(--mono); font-size: 13px; pointer-events: none; }
+  button.tb { font: 500 12px var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+  button.tb:hover { border-color: var(--accent); }
+  button.tb[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .text { padding-block: 18px; padding-inline: 22px; }
+  .text h2 { font-family: var(--display); font-size: 20px; margin: 0 0 6px; }
+  .text .eyebrow { font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .text p { max-width: 72ch; }
+  .text ol { padding-left: 22px; max-width: 72ch; }
+  .text li { margin: 6px 0; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 10px; }
+  .cols > div { min-width: 0; }
+  h3 { font-family: var(--display); font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 14px 0 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--muted); font-size: 12px; }
+  td.q, th.q { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  tr.part { cursor: pointer; }
+  tr.part:hover td, tr.part.active td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .tablewrap { overflow-x: auto; }
+  .note { border-left: 3px solid var(--accent); padding: 6px 12px; color: var(--fg); background: color-mix(in srgb, var(--accent) 8%, transparent); border-radius: 0 6px 6px 0; margin: 10px 0; max-width: 72ch; }
+  .pager { display: flex; justify-content: space-between; gap: 10px; padding: 0 22px 18px; }
+  section.gallery { margin-top: 28px; }
+  section.gallery h2 { font-family: var(--display); font-size: 20px; margin: 0 0 4px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .card:hover, .card.active { border-color: var(--accent); }
+  .card img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--scene); border-radius: 6px; max-width: 100%; }
+  .card .nm { font-family: var(--mono); font-size: 12px; word-break: break-all; }
+  .card .meta { font-size: 12px; color: var(--muted); }
+  .card .meta b { color: var(--fg); font-weight: 600; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 14px 0 6px; }
+  .summary div { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .summary b { display: block; font-family: var(--mono); font-size: 18px; }
+  .summary span { font-size: 12px; color: var(--muted); }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.steps { position: static; flex-direction: row; flex-wrap: wrap; }
+    nav.steps button { grid-template-columns: auto; }
+    nav.steps button .t { display: none; }
+    .viewer { height: 380px; }
+    .cols { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  header .links { margin: 0 0 18px; font-size: 13px; } header .links a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>ClaudeBot Build Guide</h1>
+    <p>Every printed part, in build order, with a 3D view of where it goes. Orange parts are the ones you fit in the current step; grey parts are already on. Blue shapes are bought parts (motors, battery). Drag to orbit, scroll to zoom, right-drag to pan.</p>
+    <p class="links"><a href="https://github.com/MeckMan2025/ClaudeBot">Source, STEP and STL files on GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/MeckMan2025/ClaudeBot/blob/main/PLAN.md">Design plan</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/MeckMan2025/ClaudeBot/blob/main/docs/print-guide.md">Print guide</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/MeckMan2025/ClaudeBot/blob/main/electronics/BOM.csv">Bill of materials</a></p>
+    <div class="summary">
+      <div><b id="s-parts">68</b><span>printed part designs</span></div>
+      <div><b id="s-pieces">...</b><span>pieces to print</span></div>
+      <div><b id="s-kg">...</b><span>kg of filament (est.)</span></div>
+      <div><b>160</b><span>bolts checked for fit and tool access</span></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="steps" id="nav" aria-label="Build steps"></nav>
+    <div class="stage">
+      <div class="viewer">
+        <canvas id="c"></canvas>
+        <div class="loading" id="loading">loading models...</div>
+        <div class="legend"><span><i style="background: var(--new)"></i>this step</span><span><i style="background: var(--ghost)"></i>already fitted</span><span><i style="background: var(--bought)"></i>bought part</span></div>
+        <div class="tools">
+          <button class="tb" id="t-explode" aria-pressed="false">Explode this step</button>
+          <button class="tb" id="t-ghost" aria-pressed="true">Show earlier parts</button>
+          <button class="tb" id="t-fit">Fit view</button>
+          <button class="tb" id="t-iso">3/4</button><button class="tb" id="t-top">Top</button><button class="tb" id="t-side">Side</button>
+        </div>
+      </div>
+      <div class="text" id="text"></div>
+      <div class="pager"><button class="tb" id="prev">Previous step</button><button class="tb" id="next">Next step</button></div>
+    </div>
+  </div>
+
+  <section class="gallery">
+    <h2>Every printed part</h2>
+    <p style="color: var(--muted); margin: 0;">Click a part to see it alone in the viewer. Sizes are the printed footprint in mm; mass is estimated from the volume and the recommended infill.</p>
+    <div class="grid" id="grid"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script>
+(async function () {
+  // ---------- Step text ----------
+  const STEPS = [
+    { n: 1, title: "Chassis modules", intro: "Four open tray modules bolt into one stiff box. The seam walls (the ones facing the chassis centre) are 8 mm thick and carry the bolts and dowels.",
+      steps: ["Press eight 6 mm alignment dowels into the dowel holes of the two rear modules (two per seam wall).", "Offer the front modules up to the rear ones so the dowels engage, then the two halves to each other.", "Bolt the lateral seam (across the middle) and the longitudinal seam (down the centre) with M5 x 20 bolts and nylock nuts, 16 in all. Tighten in a cross pattern.", "Fit M4 heat-set inserts into all 20 lid bosses (the 12 mm square posts in each module)."],
+      fast: [["M5 x 20 + nylock", 16], ["6 mm dowel", 8], ["M4 insert", 20]],
+      note: "Do not fit the lids yet. The motor mounts and axle housings go in first because their nuts sit inside." },
+    { n: 2, title: "Drive: motors, axle housings, wheels", intro: "Each wheel rides on two 6808 bearings on a printed axle housing bolted through the chassis wall. The motor only turns the wheel; the housing carries the weight.",
+      steps: ["Bolt each motor to its mount bracket with 4x M4 x 16 (heads sit in the counterbores on the bracket's back). Fit the 8 mm REX clamping coupler onto the motor shaft.", "Set the bracket inside the rear module against the outer wall, standoff toward the motor, so the coupler sits in the wall hole.", "From outside, push the axle housing flange onto the wall (counterbores outward) and run 4x M5 x 35 through housing, wall and bracket. Nylock nuts on the inside.", "Slide the 120 mm REX extension shaft through the housing bore into the coupler and clamp it.", "Now fit the two chassis lids: M4 x 12 into the 20 bosses. Fit M5 inserts in the lid bosses for the risers, braces, legs and battery tray.", "Press two 6808 bearings into each wheel from the flat inner face with the printed spacer between them. Slide the wheel onto the housing.", "Bolt the goBILDA REX hub to the wheel's outer web (4x M4 x 10), slide it onto the shaft end and tighten its set screw. Stretch the TPU tread over the rim ribs."],
+      fast: [["M4 x 16", 8], ["M5 x 35 + nylock", 8], ["M4 x 12", 20], ["M4 x 10", 8], ["6808 bearing", 4]],
+      note: "Spin each wheel by hand before fitting the tread. It should turn freely with no wobble; if it binds, the bearing seat needs a light ream." },
+    { n: 3, title: "Legs, battery and skirts", intro: "The side skirt panels must go on now: once the boom cross members are in, the panels cannot pass them, and the wheels block them from the side. Their flange bolts are reached from above before the deck closes the top.",
+      steps: ["Stand the two rear deck legs on the rear lid and bolt the feet down: 4x M5 x 16 each into the lid inserts.", "Bolt the battery tray to the lids with 4x M4 x 12 through its corner tabs. Lay the battery in flat and strap it.", "Drop the rear skirt and the front skirt onto the lid edges and bolt each bottom flange with 3x M4 x 12.", "Drop the four side skirt panels (two per side) straight down between the lid edge and the wheel; bolt each flange with 2x M4 x 12. Fit M4 inserts in every skirt top tab and fender boss."],
+      fast: [["M5 x 16", 8], ["M4 x 12", 18], ["M4 insert", 22]] },
+    { n: 4, title: "Boom frame", intro: "The raised front frame carries the caster spindles above tire height so the big tires can swing a full circle underneath. Build the riser and rear cross member as one unit first.",
+      steps: ["Lap the two rear cross member halves (turn one 180 degrees so the tabs sit side by side) and bolt across the joint with 2x M5 x 45 and nuts.", "Bolt the two riser columns up into the cross member's underside inserts from inside the open columns: 2x M5 x 15 each.", "Lower that unit onto the front lid and bolt the riser feet: 4x M5 x 16 each.", "Fit the braces: 2x M5 x 15 into the riser rear face, 2x M5 x 16 down into the lid.", "Lay the arms alongside, pads forward, and bolt each to the rear cross member end plate (2x M5 x 12 through the arm's inner wall; drive through the 9 mm bores in the outer wall).", "Lap and bolt the front cross member halves (2x M5 x 45), then bolt its end plates to the pads' inner walls the same way."],
+      fast: [["M5 x 45 + nut", 4], ["M5 x 15", 8], ["M5 x 16", 12], ["M5 x 12", 8]] },
+    { n: 5, title: "Casters", intro: "Zero-turn mower style: a tall spindle in two 6004 bearings, a 51104 thrust bearing carrying the weight, and a yoke with 50 mm of trail.",
+      steps: ["Press a 6004 bearing into each end of both spindle towers. Set the towers on the arm pads and bolt down: 4x M6 x 20 each.", "Drop the spindle sleeve's hex boss into the yoke crown and push the M12 x 180 bolt up through the crown and sleeve (head in the pocket under the crown). Do this before the wheel goes in.", "Press a 608 bearing into each side of the caster rim with the inner spacer between them. Stretch the TPU tire over the rim.", "Roll the wheel in between the yoke legs from the front, with an outer spacer each side, and run the M8 x 140 axle bolt through. Nylock nut, not too tight: the wheel must spin freely.", "Slide the 51104 thrust bearing over the sleeve, then push the yoke up through the pad and tower from underneath. Washer and M12 nylock on top of the tower; tighten until there is no play but the yoke still swings freely."],
+      fast: [["M6 x 20", 8], ["M12 x 180 + nylock", 2], ["M8 x 140 + nylock", 2], ["6004 bearing", 4], ["51104 thrust", 2], ["608 bearing", 4]] },
+    { n: 6, title: "Deck, enclosure and mast standoff", intro: "The deck ties the boom together and gives a 40 mm grid of M4 inserts for everything on top.",
+      steps: ["Fit the four deck quadrants in this order: rear right, rear left, front right, front left (the later ones lap over the earlier ones). Screw the seam tabs with M4 x 10.", "Bolt the deck down into the cross members and legs: 12x M5 x 15.", "Set the enclosure tub on the deck and bolt its four feet with M4 x 12. Fit the Pi 5 and the other boards, then the gasket and lid (8x M4 x 16).", "Bolt the mast standoff to the deck grid behind the enclosure: 4x M4 x 10."],
+      fast: [["M4 x 10", 20], ["M5 x 15", 12], ["M4 x 12", 4], ["M4 x 16", 8]],
+      note: "Run the motor, battery, bumper and mast looms through the PG9 glands before closing the lid." },
+    { n: 7, title: "Canopy, fenders and fittings", intro: "The canopy is one rounded shell printed as four quadrants. Its bottom band is cut away ahead of the chassis so the caster yoke crowns can sweep underneath.",
+      steps: ["Join the four canopy quadrants with the splice strips on the inside (M3 x 8 from outside): one long strip across the roof seam, two along the centre seam, four short ones on the wall seams.", "Lower the canopy over the deck and screw its bottom edge into the skirt top tabs: 8x M4 x 10 per side.", "Hang each fender on the canopy side with 3x M4 x 16 through the canopy into the skirt bosses.", "Fit the depth camera mount and hood to the nose (2x M4), the bumper carrier on its two shoulder bolts with the springs behind it, and clip the TPU skin on.", "Fit the E-stop housing (4x M3) and charge port housing on the rear, and the light bar housing across the rear face (2x M3)."],
+      fast: [["M3 x 8", 40], ["M4 x 10", 16], ["M4 x 16", 6], ["M5 x 30 shoulder", 2], ["M3 x 10", 8]] },
+    { n: 8, title: "Mast and camera head", intro: "A 400 mm two-piece mast with the pan-tilt camera and the GPS puck on top. Every joint is a 30 mm spigot with an M4 cross bolt.",
+      steps: ["Bolt the mast base through the canopy roof into the standoff: 4x M5 x 25.", "Slide the first segment over the base spigot, cross-bolt it (M4 x 45), then the second segment the same way.", "Drop the pan servo into the pan base, push the base onto the top spigot and cross-bolt.", "Screw the tilt bracket to the pan servo horn. Fit the tilt servo in the bracket arm.", "Mount the Pi Camera on the housing standoffs, fit the window and rear cover, then hook the housing's pin into the bracket arm and screw the other side to the tilt servo horn.", "Bolt the GPS mount to the rear of the pan base (2x M4) and seat the puck in the cup."],
+      fast: [["M5 x 25", 4], ["M4 x 45 + nut", 3], ["M4 x 10", 2], ["M3 x 10", 4]] },
+    { n: 9, title: "Charging dock", intro: "Four lap-jointed tiles make a 550 x 620 mm pad. The rails steer the caster tires as the robot reverses on, and the contact block meets the pads on the chassis rear.",
+      steps: ["Lap the four tiles together (tabs under the neighbour) and bolt with M5 x 20: 12 bolts.", "Stake the pad to the ground through the corner holes.", "Bolt the rail halves to the tile inserts so they funnel the casters toward the block.", "Fit the spring contacts in the block, bolt it to the tiles, then the rain cover over it and the AprilTag frame on the cover posts."],
+      fast: [["M5 x 20", 12], ["M5 x 16", 12], ["M4 x 12", 4], ["ground stake", 4]] },
+  ];
+
+  // Dock parts are laid out here (they are not part of the robot assembly).
+  const DOCK = [
+    { instance: "tile_a", part: "dock_tile", step: 9, ops: [["t", [-137.5, 155, 0]]] },
+    { instance: "tile_b", part: "dock_tile", step: 9, ops: [["t", [137.5, 155, 0]]] },
+    { instance: "tile_c", part: "dock_tile", step: 9, ops: [["t", [-137.5, -155, 0]]] },
+    { instance: "tile_d", part: "dock_tile", step: 9, ops: [["t", [137.5, -155, 0]]] },
+    { instance: "rail_1", part: "dock_rail_half", step: 9, ops: [["t", [-110, 250, 14]]] },
+    { instance: "rail_2", part: "dock_rail_half", step: 9, ops: [["t", [120, 250, 14]]] },
+    { instance: "rail_3", part: "dock_rail_half", step: 9, ops: [["t", [-110, -250, 14]]] },
+    { instance: "rail_4", part: "dock_rail_half", step: 9, ops: [["t", [120, -250, 14]]] },
+    { instance: "block", part: "dock_contact_block", step: 9, ops: [["t", [-220, 0, 14]]] },
+    { instance: "cover", part: "dock_rain_cover", step: 9, ops: [["t", [-220, 0, 14 + 150 + 60]]] },
+    { instance: "tag", part: "dock_tag_frame", step: 9, ops: [["rx", 90], ["t", [-250, 0, 14 + 150 + 60 + 90]]] },
+  ];
+
+  // Bought-part envelopes shown in blue (same numbers as the CAD audit).
+  const BOUGHT = [
+    { step: 2, kind: "cyl", r: 18.5, len: 120, from: [-160, 129, 150], dir: [0, -1, 0], label: "motor" },
+    { step: 2, kind: "cyl", r: 18.5, len: 120, from: [-160, -129, 150], dir: [0, 1, 0], label: "motor" },
+    { step: 3, kind: "box", size: [180, 150, 75], at: [-100, 0, 190 + 37.5], label: "battery" },
+  ];
+
+  function insertionDir(inst) {
+    const sy = inst.endsWith("_left") ? 1 : -1;
+    if (/^(axle_housing|wheel_|tread_)/.test(inst)) return [0, sy, 0];
+    if (/^motor_mount/.test(inst)) return [0, -sy, 0];
+    if (/^(fork_|sleeve_)/.test(inst)) return [0, 0, -1];
+    if (/^(caster_rim|caster_tire)/.test(inst)) return [1, 0, 0];
+    if (["skirt_rear", "light_bar_housing", "gps_mount"].includes(inst)) return [-1, 0, 0];
+    if (["bumper_carrier", "bumper_skin", "oak_mount", "camera_housing"].includes(inst)) return [1, 0, 0];
+    return [0, 0, 1];
+  }
+
+  // ---------- Data ----------
+  const [manifest, asmRobot] = await Promise.all([fetch("models/manifest.json").then(r => r.json()), fetch("assembly.json").then(r => r.json())]);
+  const asm = asmRobot.concat(DOCK);
+  const byPart = {}; manifest.forEach(m => { byPart[m.part] = m; });
+  const DENS = { "TPU 95A": 1.21 };
+  function estMass(m) { const rho = DENS[m.material] || 1.27; const shell = Math.min(0.25 + 0.08 * m.walls, 0.75); return m.volume_cm3 * rho * (shell + (1 - shell) * m.infill_pct / 100); }
+  let pieces = 0, kg = 0;
+  manifest.forEach(m => { pieces += m.qty; kg += estMass(m) * m.qty / 1000; });
+  document.getElementById("s-pieces").textContent = pieces;
+  document.getElementById("s-kg").textContent = kg.toFixed(1);
+
+  // ---------- Three.js ----------
+  const canvas = document.getElementById("c");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 5, 20000);
+  camera.up.set(0, 0, 1);
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x667766, 0.7));
+  const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(600, -900, 1200); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-800, 600, 400); scene.add(fill);
+  const cssColor = name => new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue(name).trim());
+  function theme() { scene.background = cssColor("--scene"); }
+  theme();
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { theme(); recolor(); }); } catch (e) {}
+  new MutationObserver(() => { theme(); recolor(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  const loader = new THREE.STLLoader();
+  const geos = {};
+  const names = Object.keys(byPart);
+  let loaded = 0;
+  await Promise.all(names.map(n => fetch(`models/${n}.b64.json`).then(r => r.json()).then(j => { const bin = atob(j.stl_b64); const buf = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i); const g = loader.parse(buf.buffer); g.computeVertexNormals(); geos[n] = g; loaded++; document.getElementById("loading").textContent = `loading models... ${loaded}/${names.length}`; }).catch(() => {})));
+  document.getElementById("loading").hidden = true;
+
+  // Instances
+  const root = new THREE.Group(); scene.add(root);
+  const inst = asm.map(a => {
+    const g = geos[a.part]; if (!g) return null;
+    const mat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.6, metalness: 0.05, transparent: true });
+    const mesh = new THREE.Mesh(g, mat);
+    // apply ops in order about the world origin
+    const m = new THREE.Matrix4();
+    a.ops.forEach(([k, v]) => {
+      const t = new THREE.Matrix4();
+      if (k === "t") t.makeTranslation(v[0], v[1], v[2]);
+      else if (k === "rx") t.makeRotationX(THREE.MathUtils.degToRad(v));
+      else if (k === "ry") t.makeRotationY(THREE.MathUtils.degToRad(v));
+      else if (k === "rz") t.makeRotationZ(THREE.MathUtils.degToRad(v));
+      m.premultiply(t);
+    });
+    mesh.matrixAutoUpdate = false; mesh.matrix.copy(m); mesh.userData.base = m.clone();
+    mesh.userData.inst = a; root.add(mesh);
+    return { a, mesh };
+  }).filter(Boolean);
+  const bought = BOUGHT.map(b => {
+    let mesh;
+    if (b.kind === "cyl") {
+      mesh = new THREE.Mesh(new THREE.CylinderGeometry(b.r, b.r, b.len, 32), new THREE.MeshStandardMaterial({ color: 0x3f7fbf, roughness: 0.5, transparent: true, opacity: 0.75 }));
+      const d = new THREE.Vector3(...b.dir), from = new THREE.Vector3(...b.from);
+      mesh.position.copy(from).addScaledVector(d, b.len / 2);
+      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d);
+    } else {
+      mesh = new THREE.Mesh(new THREE.BoxGeometry(...b.size), new THREE.MeshStandardMaterial({ color: 0x3f7fbf, roughness: 0.5, transparent: true, opacity: 0.75 }));
+      mesh.position.set(...b.at);
+    }
+    mesh.userData.step = b.step; root.add(mesh); return mesh;
+  });
+
+  // ---------- State ----------
+  let step = 1, exploded = false, ghost = true, soloPart = null, activeInst = null;
+  function recolor() {
+    const cNew = cssColor("--new"), cGhost = cssColor("--ghost"), cB = cssColor("--bought");
+    inst.forEach(({ a, mesh }) => {
+      if (soloPart) { mesh.visible = a.part === soloPart && a === soloInstance(soloPart); mesh.material.color.copy(cNew); mesh.material.opacity = 1; return; }
+      const cur = a.step === step, prior = a.step < step;
+      mesh.visible = cur || (prior && ghost);
+      mesh.material.color.copy(cur ? cNew : cGhost);
+      mesh.material.opacity = cur ? 1 : 0.35;
+      mesh.material.depthWrite = cur;
+      if (activeInst && a.instance === activeInst) { mesh.material.color.set(0xffc46b); }
+      const d = insertionDir(a.instance), off = exploded && cur ? 140 : 0;
+      mesh.matrix.copy(mesh.userData.base).premultiply(new THREE.Matrix4().makeTranslation(d[0] * off, d[1] * off, d[2] * off));
+    });
+    bought.forEach(m => { m.visible = !soloPart && m.userData.step <= step && (m.userData.step === step || ghost); m.material.color.copy(cB); });
+  }
+  function soloInstance(part) { return inst.find(i => i.a.part === part).a; }
+  function fit(group) {
+    const box = new THREE.Box3();
+    let any = false;
+    inst.forEach(({ a, mesh }) => { if (mesh.visible && (soloPart || a.step === step)) { box.expandByObject(mesh); any = true; } });
+    if (!any) inst.forEach(({ mesh }) => { if (mesh.visible) box.expandByObject(mesh); });
+    const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()).length();
+    controls.target.copy(c);
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    if (!isFinite(dir.length()) || dir.length() === 0) dir.set(1, -1, 0.7).normalize();
+    camera.position.copy(c).addScaledVector(dir, Math.max(s * 1.1, 300));
+    controls.update();
+  }
+  function view(dir) { const c = controls.target.clone(); const dist = camera.position.distanceTo(c); camera.position.copy(c).addScaledVector(new THREE.Vector3(...dir).normalize(), dist); controls.update(); }
+
+  // ---------- Step UI ----------
+  const nav = document.getElementById("nav");
+  STEPS.forEach(s => { const b = document.createElement("button"); b.innerHTML = `<span class="n">${s.n}</span><span class="t">${s.title}</span>`; b.addEventListener("click", () => go(s.n)); nav.appendChild(b); });
+  function go(n) {
+    step = n; soloPart = null; activeInst = null; exploded = false;
+    document.getElementById("t-explode").setAttribute("aria-pressed", "false");
+    [...nav.children].forEach((b, i) => b.setAttribute("aria-current", i + 1 === n ? "step" : "false"));
+    document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
+    render();
+    recolor(); camera.position.set(1, -1, 0.7); fit();
+    try { location.hash = "step" + n; } catch (e) {}
+  }
+  function render() {
+    const s = STEPS[step - 1];
+    const rows = {};
+    asm.filter(a => a.step === step).forEach(a => { rows[a.part] = rows[a.part] || { n: 0, insts: [] }; rows[a.part].n++; rows[a.part].insts.push(a.instance); });
+    const partRows = Object.entries(rows).map(([p, r]) => { const m = byPart[p]; return `<tr class="part" data-part="${p}" data-insts="${r.insts.join(',')}"><td><code>${p}</code><br><span style="color: var(--muted); font-size: 12px">${m ? m.material : ""}</span></td><td class="q">${r.n}</td><td style="font-size: 12.5px">${m ? m.notes : ""}</td></tr>`; }).join("");
+    const fast = s.fast.map(([f, n]) => `<tr><td>${f}</td><td class="q">${n}</td></tr>`).join("");
+    document.getElementById("text").innerHTML = `
+      <div class="eyebrow">Step ${s.n} of ${STEPS.length}</div>
+      <h2>${s.title}</h2>
+      <p>${s.intro}</p>
+      <ol>${s.steps.map(x => `<li>${x}</li>`).join("")}</ol>
+      ${s.note ? `<div class="note">${s.note}</div>` : ""}
+      <div class="cols">
+        <div><h3>Printed parts in this step</h3><div class="tablewrap"><table><thead><tr><th>Part</th><th class="q">Qty</th><th>Notes</th></tr></thead><tbody>${partRows}</tbody></table></div></div>
+        <div><h3>Fasteners and bearings</h3><table><thead><tr><th>Item</th><th class="q">Qty</th></tr></thead><tbody>${fast}</tbody></table></div>
+      </div>`;
+    document.querySelectorAll("tr.part").forEach(tr => tr.addEventListener("click", () => {
+      const insts = tr.dataset.insts.split(",");
+      activeInst = activeInst === insts[0] ? null : insts[0];
+      document.querySelectorAll("tr.part").forEach(t => t.classList.toggle("active", t === tr && activeInst));
+      recolor();
+    }));
+    document.getElementById("prev").disabled = step === 1;
+    document.getElementById("next").disabled = step === STEPS.length;
+  }
+  document.getElementById("prev").addEventListener("click", () => go(Math.max(1, step - 1)));
+  document.getElementById("next").addEventListener("click", () => go(Math.min(STEPS.length, step + 1)));
+  document.getElementById("t-explode").addEventListener("click", e => { exploded = !exploded; e.currentTarget.setAttribute("aria-pressed", String(exploded)); recolor(); });
+  document.getElementById("t-ghost").addEventListener("click", e => { ghost = !ghost; e.currentTarget.setAttribute("aria-pressed", String(ghost)); recolor(); });
+  document.getElementById("t-fit").addEventListener("click", () => fit());
+  document.getElementById("t-iso").addEventListener("click", () => view([1, -1, 0.7]));
+  document.getElementById("t-top").addEventListener("click", () => view([0.001, 0.001, 1]));
+  document.getElementById("t-side").addEventListener("click", () => view([0, -1, 0.05]));
+
+  // ---------- Gallery with thumbnails ----------
+  const grid = document.getElementById("grid");
+  const thumbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+  thumbRenderer.setSize(220, 220); thumbRenderer.outputEncoding = THREE.sRGBEncoding;
+  const tScene = new THREE.Scene(); tScene.add(new THREE.HemisphereLight(0xffffff, 0x667766, 0.8));
+  const tKey = new THREE.DirectionalLight(0xffffff, 0.7); tKey.position.set(1, -1, 1.5); tScene.add(tKey);
+  const tCam = new THREE.PerspectiveCamera(30, 1, 1, 10000); tCam.up.set(0, 0, 1);
+  const tMat = new THREE.MeshStandardMaterial({ color: 0xe0601a, roughness: 0.6 });
+  names.sort().forEach(n => {
+    const m = byPart[n];
+    const card = document.createElement("div"); card.className = "card"; card.dataset.part = n;
+    const img = document.createElement("img"); img.alt = n; card.appendChild(img);
+    card.insertAdjacentHTML("beforeend", `<div class="nm">${n}</div><div class="meta"><b>x${m.qty}</b> ${m.material}<br>${m.x_mm} x ${m.y_mm} x ${m.z_mm} mm, ~${estMass(m).toFixed(0)} g each<br>${m.walls} walls, ${m.infill_pct}% infill${m.supports === "yes" ? ", supports" : ""}</div>`);
+    card.addEventListener("click", () => {
+      soloPart = soloPart === n ? null : n;
+      document.querySelectorAll(".card").forEach(c => c.classList.toggle("active", c.dataset.part === soloPart));
+      recolor(); camera.position.set(1, -1, 0.7); fit();
+      document.querySelector(".viewer").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    grid.appendChild(card);
+    const g = geos[n]; if (!g) return;
+    const mesh = new THREE.Mesh(g, tMat); tScene.add(mesh);
+    g.computeBoundingBox(); const bb = g.boundingBox; const c = bb.getCenter(new THREE.Vector3()); const s = bb.getSize(new THREE.Vector3()).length();
+    tCam.position.copy(c).add(new THREE.Vector3(1, -1, 0.8).normalize().multiplyScalar(s * 1.05)); tCam.lookAt(c);
+    thumbRenderer.render(tScene, tCam);
+    img.src = thumbRenderer.domElement.toDataURL("image/png");
+    tScene.remove(mesh);
+  });
+  thumbRenderer.dispose();
+
+  // ---------- Start ----------
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.floor(w * renderer.getPixelRatio()) || canvas.height !== Math.floor(h * renderer.getPixelRatio())) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  }
+  let start = 1;
+  try { const m = /^#step(\d)$/.exec(location.hash); if (m) start = Math.min(STEPS.length, Math.max(1, +m[1])); } catch (e) {}
+  go(start);
+  (function loop() { resize(); controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1134 @@
+[
+ {
+  "instance": "rear_left",
+  "part": "chassis_module_rear_left",
+  "step": 1,
+  "ops": [
+   [
+    "t",
+    [
+     -192.5,
+     75.0,
+     90.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "rear_right",
+  "part": "chassis_module_rear_right",
+  "step": 1,
+  "ops": [
+   [
+    "t",
+    [
+     -192.5,
+     -75.0,
+     90.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "front_left",
+  "part": "chassis_module_front_left",
+  "step": 1,
+  "ops": [
+   [
+    "t",
+    [
+     -17.5,
+     75.0,
+     90.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "front_right",
+  "part": "chassis_module_front_right",
+  "step": 1,
+  "ops": [
+   [
+    "t",
+    [
+     -17.5,
+     -75.0,
+     90.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "motor_mount_left",
+  "part": "motor_mount_bracket",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     145.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "axle_housing_left",
+  "part": "drive_axle_housing",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     150.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "motor_mount_right",
+  "part": "motor_mount_bracket",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     -145.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "axle_housing_right",
+  "part": "drive_axle_housing",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     -150.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "lid_rear",
+  "part": "chassis_lid_rear",
+  "step": 2,
+  "ops": [
+   [
+    "t",
+    [
+     -192.5,
+     0,
+     180.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "lid_front",
+  "part": "chassis_lid_front",
+  "step": 2,
+  "ops": [
+   [
+    "t",
+    [
+     -17.5,
+     0,
+     180.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "wheel_left",
+  "part": "drive_wheel",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     162.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "tread_left",
+  "part": "drive_tread",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     162.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "wheel_right",
+  "part": "drive_wheel",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     -162.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "tread_right",
+  "part": "drive_tread",
+  "step": 2,
+  "ops": [
+   [
+    "rx",
+    90
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     -162.0,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "leg_left",
+  "part": "rear_deck_leg",
+  "step": 3,
+  "ops": [
+   [
+    "t",
+    [
+     -230.0,
+     105.0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "leg_right",
+  "part": "rear_deck_leg",
+  "step": 3,
+  "ops": [
+   [
+    "t",
+    [
+     -230.0,
+     -105.0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "battery_tray",
+  "part": "battery_tray",
+  "step": 3,
+  "ops": [
+   [
+    "t",
+    [
+     -100.0,
+     0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "skirt_rear",
+  "part": "skirt_rear",
+  "step": 3,
+  "ops": [
+   [
+    "rz",
+    -90
+   ],
+   [
+    "t",
+    [
+     -278.5,
+     0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "skirt_front",
+  "part": "skirt_front",
+  "step": 3,
+  "ops": [
+   [
+    "rz",
+    90
+   ],
+   [
+    "t",
+    [
+     68.5,
+     0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "skirt_side_rear_left",
+  "part": "skirt_side_rear",
+  "step": 3,
+  "ops": [
+   [
+    "rz",
+    180
+   ],
+   [
+    "t",
+    [
+     -191.0,
+     148.5,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "skirt_side_front_left",
+  "part": "skirt_side_front",
+  "step": 3,
+  "ops": [
+   [
+    "rz",
+    180
+   ],
+   [
+    "t",
+    [
+     -19.0,
+     148.5,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "skirt_side_rear_right",
+  "part": "skirt_side_rear",
+  "step": 3,
+  "ops": [
+   [
+    "rz",
+    0
+   ],
+   [
+    "t",
+    [
+     -191.0,
+     -148.5,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "skirt_side_front_right",
+  "part": "skirt_side_front",
+  "step": 3,
+  "ops": [
+   [
+    "rz",
+    0
+   ],
+   [
+    "t",
+    [
+     -19.0,
+     -148.5,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "riser_left",
+  "part": "riser_column",
+  "step": 4,
+  "ops": [
+   [
+    "t",
+    [
+     30.0,
+     105.0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "cross_rear_left",
+  "part": "boom_cross_rear_half",
+  "step": 4,
+  "ops": [
+   [
+    "rz",
+    90
+   ],
+   [
+    "t",
+    [
+     30.0,
+     0,
+     315.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "riser_right",
+  "part": "riser_column",
+  "step": 4,
+  "ops": [
+   [
+    "t",
+    [
+     30.0,
+     -105.0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "cross_rear_right",
+  "part": "boom_cross_rear_half",
+  "step": 4,
+  "ops": [
+   [
+    "rz",
+    -90
+   ],
+   [
+    "t",
+    [
+     30.0,
+     0,
+     315.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "brace_left",
+  "part": "riser_brace",
+  "step": 4,
+  "ops": [
+   [
+    "t",
+    [
+     0,
+     105.0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "boom_arm_left",
+  "part": "boom_arm_left",
+  "step": 4,
+  "ops": [
+   [
+    "t",
+    [
+     10.0,
+     200.0,
+     315.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "brace_right",
+  "part": "riser_brace",
+  "step": 4,
+  "ops": [
+   [
+    "t",
+    [
+     0,
+     -105.0,
+     186.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "boom_arm_right",
+  "part": "boom_arm_right",
+  "step": 4,
+  "ops": [
+   [
+    "t",
+    [
+     10.0,
+     -200.0,
+     315.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "cross_front_left",
+  "part": "boom_cross_front_half",
+  "step": 4,
+  "ops": [
+   [
+    "rz",
+    90
+   ],
+   [
+    "t",
+    [
+     280.0,
+     0,
+     315.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "cross_front_right",
+  "part": "boom_cross_front_half",
+  "step": 4,
+  "ops": [
+   [
+    "rz",
+    -90
+   ],
+   [
+    "t",
+    [
+     280.0,
+     0,
+     315.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "tower_left",
+  "part": "caster_spindle_tower",
+  "step": 5,
+  "ops": [
+   [
+    "t",
+    [
+     280.0,
+     205.0,
+     355.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "sleeve_left",
+  "part": "caster_spindle_sleeve",
+  "step": 5,
+  "ops": [
+   [
+    "t",
+    [
+     280.0,
+     205.0,
+     305.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "fork_left",
+  "part": "caster_fork",
+  "step": 5,
+  "ops": [
+   [
+    "t",
+    [
+     280.0,
+     205.0,
+     140.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "caster_rim_left",
+  "part": "caster_rim",
+  "step": 5,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     230.0,
+     155.0,
+     140.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "caster_tire_left",
+  "part": "caster_tire",
+  "step": 5,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     230.0,
+     155.0,
+     140.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "tower_right",
+  "part": "caster_spindle_tower",
+  "step": 5,
+  "ops": [
+   [
+    "t",
+    [
+     280.0,
+     -205.0,
+     355.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "sleeve_right",
+  "part": "caster_spindle_sleeve",
+  "step": 5,
+  "ops": [
+   [
+    "t",
+    [
+     280.0,
+     -205.0,
+     305.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "fork_right",
+  "part": "caster_fork",
+  "step": 5,
+  "ops": [
+   [
+    "t",
+    [
+     280.0,
+     -205.0,
+     140.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "caster_rim_right",
+  "part": "caster_rim",
+  "step": 5,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     230.0,
+     -255.0,
+     140.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "caster_tire_right",
+  "part": "caster_tire",
+  "step": 5,
+  "ops": [
+   [
+    "rx",
+    -90
+   ],
+   [
+    "t",
+    [
+     230.0,
+     -255.0,
+     140.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "deck_rear_right",
+  "part": "deck_rear_right",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     -127.5,
+     -72.5,
+     355.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "deck_rear_left",
+  "part": "deck_rear_left",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     -127.5,
+     72.5,
+     355.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "deck_front_right",
+  "part": "deck_front_right",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     157.5,
+     -72.5,
+     355.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "deck_front_left",
+  "part": "deck_front_left",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     157.5,
+     72.5,
+     355.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "enclosure_tub",
+  "part": "enclosure_tub",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     10.0,
+     0,
+     361.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "enclosure_lid",
+  "part": "enclosure_lid",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     10.0,
+     0,
+     441.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "mast_standoff",
+  "part": "mast_standoff",
+  "step": 6,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     361.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "canopy_front_left",
+  "part": "canopy_front_left",
+  "step": 7,
+  "ops": [
+   [
+    "t",
+    [
+     180.0,
+     76.75,
+     290.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "canopy_front_right",
+  "part": "canopy_front_right",
+  "step": 7,
+  "ops": [
+   [
+    "t",
+    [
+     180.0,
+     -76.75,
+     290.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "canopy_rear_left",
+  "part": "canopy_rear_left",
+  "step": 7,
+  "ops": [
+   [
+    "t",
+    [
+     -130.0,
+     76.75,
+     290.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "canopy_rear_right",
+  "part": "canopy_rear_right",
+  "step": 7,
+  "ops": [
+   [
+    "t",
+    [
+     -130.0,
+     -76.75,
+     290.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "fender_left",
+  "part": "fender",
+  "step": 7,
+  "ops": [
+   [
+    "rz",
+    0
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     153.5,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "fender_right",
+  "part": "fender",
+  "step": 7,
+  "ops": [
+   [
+    "rz",
+    180
+   ],
+   [
+    "t",
+    [
+     -160.0,
+     -153.5,
+     150.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "bumper_carrier",
+  "part": "bumper_carrier",
+  "step": 7,
+  "ops": [
+   [
+    "rz",
+    -90
+   ],
+   [
+    "t",
+    [
+     367.0,
+     0,
+     305.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "bumper_skin",
+  "part": "bumper_skin",
+  "step": 7,
+  "ops": [
+   [
+    "rz",
+    -90
+   ],
+   [
+    "t",
+    [
+     378.0,
+     0,
+     301.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "oak_mount",
+  "part": "oak_mount",
+  "step": 7,
+  "ops": [
+   [
+    "rz",
+    -90
+   ],
+   [
+    "t",
+    [
+     341.0,
+     0,
+     390.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "estop_housing",
+  "part": "estop_housing",
+  "step": 7,
+  "ops": [
+   [
+    "t",
+    [
+     -240.0,
+     95.0,
+     460.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "light_bar_housing",
+  "part": "light_bar_housing",
+  "step": 7,
+  "ops": [
+   [
+    "rz",
+    90
+   ],
+   [
+    "t",
+    [
+     -293.0,
+     0,
+     423.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "mast_base",
+  "part": "mast_base",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     460.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "mast_segment_0",
+  "part": "mast_segment",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     468.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "mast_segment_1",
+  "part": "mast_segment",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     668.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "pan_base",
+  "part": "pan_base",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     868.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "tilt_bracket",
+  "part": "tilt_bracket",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     942.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "camera_housing",
+  "part": "camera_housing",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -190.0,
+     0,
+     958.0
+    ]
+   ]
+  ]
+ },
+ {
+  "instance": "gps_mount",
+  "part": "gps_mount",
+  "step": 8,
+  "ops": [
+   [
+    "t",
+    [
+     -218.0,
+     0,
+     878.0
+    ]
+   ]
+  ]
+ }
+]

@@ -1,0 +1,9 @@
+name = "lawnbot"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "site"
+
+[[routes]]
+pattern = "lawnbot.meckman.org"
+custom_domain = true
