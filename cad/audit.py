@@ -1,4 +1,4 @@
-"""Virtual build: assemble ClaudeBot in order and look for anything a human could not do.
+"""Virtual build: assemble LawnBot in order and look for anything a human could not do.
 
 Three checks:
 1. Insertion sweeps. Every part is slid along its insertion path (120 mm) into its final position with

@@ -1,4 +1,4 @@
-# ClaudeBot
+# LawnBot
 
 A fully 3D-printed outdoor patrol robot: two 300 mm rear drive wheels, two zero-turn-mower-size front casters, a Raspberry Pi 5 brain and Claude for judgement. See `PLAN.md` for the design and `docs/` for the generated guides.
 

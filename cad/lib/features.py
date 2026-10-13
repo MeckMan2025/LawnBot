@@ -1,4 +1,4 @@
-"""Reusable printed-part features for ClaudeBot.
+"""Reusable printed-part features for LawnBot.
 
 All helpers take and return cq.Workplane objects with a single solid, in the part's own
 frame. Parts are modelled in their print orientation unless noted.

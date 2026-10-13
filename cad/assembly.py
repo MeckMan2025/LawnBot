@@ -139,7 +139,7 @@ def main(check=True):
     print(f"placed {len(items)} instances in {time.time() - t0:.1f}s")
     with open(os.path.join(OUT, "assembly.json"), "w") as fh:
         json.dump([{"instance": i, "part": p, "step": s, "ops": o} for i, p, s, o, _ in items], fh, indent=1)
-    asm = cq.Assembly(name="ClaudeBot")
+    asm = cq.Assembly(name="LawnBot")
     for inst, part, step, ops, solid in items:
         asm.add(solid, name=inst)
     asm.export(os.path.join(OUT, "assembly.step"))

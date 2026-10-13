@@ -13,14 +13,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 GUIDE = ROOT / "docs" / "guide"
 SITE = ROOT / "site"
-REPO_URL = "https://github.com/MeckMan2025/ClaudeBot"
+REPO_URL = "https://github.com/MeckMan2025/LawnBot"
 
 HEAD = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="ClaudeBot: a fully 3D-printed outdoor patrol robot. Every printed part in build order with an interactive 3D view, print settings and the bought-parts list.">
+<meta name="description" content="LawnBot: a fully 3D-printed outdoor patrol robot. Every printed part in build order with an interactive 3D view, print settings and the bought-parts list.">
 <meta name="theme-color" content="#e0601a">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }</style>

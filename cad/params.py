@@ -1,4 +1,4 @@
-"""Every shared dimension for ClaudeBot, in millimetres.
+"""Every shared dimension for LawnBot, in millimetres.
 
 Coordinate frame for the whole robot: X forward, Y left, Z up, Z = 0 at the ground.
 Change a number here and every part that depends on it follows.

@@ -1,4 +1,4 @@
-<title>ClaudeBot Build Guide</title>
+<title>LawnBot Build Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   /* Layout: step list on the left, a 3D stage with the written step on the right; the part gallery runs below. */
@@ -70,7 +70,29 @@
   .summary div { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
   .summary b { display: block; font-family: var(--mono); font-size: 18px; }
   .summary span { font-size: 12px; color: var(--muted); }
+  /* Hero: the assembled robot in a drivable yard. The scene is a sunny day in both themes; its overlays use fixed colours. */
+  .hero { position: relative; height: 580px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); margin-bottom: 24px; background: #bcd7ee; }
+  .hero canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; }
+  .hero canvas:focus-visible { box-shadow: inset 0 0 0 3px var(--accent); }
+  .hero-title { position: absolute; left: 16px; top: 14px; max-width: 44ch; background: rgba(255, 255, 255, 0.8); color: #16200f; padding: 12px 16px; border-radius: 10px; backdrop-filter: blur(6px); pointer-events: none; }
+  .hero-title h1 { font-family: var(--display); font-size: 38px; line-height: 1; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .hero-title p { margin: 0; font-size: 13.5px; color: #3a4433; }
+  .hero-title kbd { font-family: var(--mono); font-size: 12px; background: #16200f; color: #fff; padding: 1px 6px; border-radius: 4px; }
+  .hud { position: absolute; left: 16px; bottom: 14px; display: flex; gap: 14px; align-items: center; background: rgba(22, 32, 15, 0.82); color: #e8f0dc; font-family: var(--mono); font-size: 13px; padding: 8px 12px; border-radius: 8px; pointer-events: none; max-width: calc(100% - 32px); }
+  .hud b { color: #ffb070; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .hud #hud-msg { min-width: 0; }
+  .hero-reset { position: absolute; right: 16px; top: 14px; }
+  .pad { position: absolute; right: 16px; bottom: 14px; display: none; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(2, 48px); gap: 6px; }
+  .pad button { font-size: 18px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.25); background: rgba(255,255,255,0.85); color: #16200f; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .pad button[data-k="w"] { grid-column: 2; grid-row: 1; } .pad button[data-k="a"] { grid-column: 1; grid-row: 2; } .pad button[data-k="s"] { grid-column: 2; grid-row: 2; } .pad button[data-k="d"] { grid-column: 3; grid-row: 2; }
+  @media (pointer: coarse) { .pad { display: grid; } }
+  .hero .loading { color: #16200f; }
+  header h2.guide { font-family: var(--display); font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; text-wrap: balance; }
   @media (max-width: 900px) {
+    .hero { height: 440px; }
+    .hero-title { max-width: calc(100% - 32px); padding: 10px 12px; }
+    .hero-title h1 { font-size: 28px; }
+    .hero-title p { font-size: 12.5px; }
     .layout { grid-template-columns: 1fr; }
     nav.steps { position: static; flex-direction: row; flex-wrap: wrap; }
     nav.steps button { grid-template-columns: auto; }
@@ -82,8 +104,20 @@
 </style>
 
 <div class="wrap">
+  <section class="hero" aria-label="LawnBot yard simulator">
+    <canvas id="hero" tabindex="0" aria-label="Drive LawnBot around the yard with the W, A, S and D keys. Drag to look around, scroll to zoom."></canvas>
+    <div class="hero-title">
+      <h1>LawnBot</h1>
+      <p>A fully 3D-printed outdoor patrol robot. Take it for a drive: click the yard, then <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys. Drag to look around, scroll to zoom. It reports what it finds as it passes the porch, the side gate, the mailbox and the shed.</p>
+    </div>
+    <button class="tb hero-reset" id="hero-reset">Reset</button>
+    <div class="hud"><span><b id="hud-speed">0.00</b> m/s</span><span id="hud-msg">Patrol idle. Waiting for a driver.</span></div>
+    <div class="pad" aria-label="Touch drive controls"><button data-k="w" aria-label="Forward">&#9650;</button><button data-k="a" aria-label="Turn left">&#9664;</button><button data-k="s" aria-label="Reverse">&#9660;</button><button data-k="d" aria-label="Turn right">&#9654;</button></div>
+    <div class="loading" id="hero-loading">loading models...</div>
+  </section>
+
   <header>
-    <h1>ClaudeBot Build Guide</h1>
+    <h2 class="guide">Build guide</h2>
     <p>Every printed part, in build order, with a 3D view of where it goes. Orange parts are the ones you fit in the current step; grey parts are already on. Blue shapes are bought parts (motors, battery). Drag to orbit, scroll to zoom, right-drag to pan.</p>
     <div class="summary">
       <div><b id="s-parts">68</b><span>printed part designs</span></div>
@@ -123,6 +157,254 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
 <script>
+// ---------- Hero: the assembled robot driving around a yard ----------
+// World units are millimetres, X/Y on the ground, Z up (the same frame as the CAD). The robot's own frame has
+// X forward and Y left, so a heading of 0 drives along world +X.
+window.buildHero = function (geos, asmRobot, DOCK, byPart) {
+  const canvas = document.getElementById("hero");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xbcd7ee);
+  scene.fog = new THREE.Fog(0xbcd7ee, 14000, 42000);
+  const camera = new THREE.PerspectiveCamera(45, 1, 40, 80000); camera.up.set(0, 0, 1);
+  scene.add(new THREE.HemisphereLight(0xd6e8ff, 0x5f8a36, 0.85));
+  const sun = new THREE.DirectionalLight(0xfff1dc, 1.05);
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -4000, right: 4000, top: 4000, bottom: -4000, near: 200, far: 20000 });
+  sun.shadow.camera.updateProjectionMatrix(); sun.shadow.bias = -0.0004;
+  scene.add(sun); scene.add(sun.target);
+
+  // ---- materials and simple builders ----
+  const mat = (color, extra) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.9, metalness: 0 }, extra || {}));
+  const cols = [];                      // collision shapes: {x0,y0,x1,y1} or {x,y,r}
+  function box(w, d, h, x, y, z, m, shadow) { const b = new THREE.Mesh(new THREE.BoxGeometry(w, d, h), m); b.position.set(x, y, (z || 0) + h / 2); b.castShadow = shadow !== false; b.receiveShadow = true; scene.add(b); return b; }
+  function slab(w, d, x, y, m, z) { const s = new THREE.Mesh(new THREE.PlaneGeometry(w, d), m); s.position.set(x, y, z || 6); s.receiveShadow = true; scene.add(s); return s; }
+  function cyl(r, h, x, y, z, m) { const c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 14), m); c.rotation.x = Math.PI / 2; c.position.set(x, y, (z || 0) + h / 2); c.castShadow = true; scene.add(c); return c; }
+
+  // ---- lawn ----
+  const tex = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d");
+    const img = g.createImageData(256, 256), d = img.data;
+    for (let i = 0; i < 256 * 256; i++) {
+      const x = i % 256, y = (i / 256) | 0, stripe = ((x / 64) | 0) % 2 ? 6 : -6, n = (Math.random() - 0.5) * 26;
+      d[i * 4] = 86 + stripe + n * 0.6; d[i * 4 + 1] = 142 + stripe + n; d[i * 4 + 2] = 54 + stripe * 0.5 + n * 0.5; d[i * 4 + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(60, 48); t.anisotropy = 8; t.encoding = THREE.sRGBEncoding; return t;
+  })();
+  const YARD = { x0: -18000, x1: 18000, y0: -11400, y1: 14800 };
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(44000, 36000), mat(0xffffff, { map: tex, roughness: 1 }));
+  ground.position.set(0, 1500, 0); ground.receiveShadow = true; scene.add(ground);
+
+  // ---- hardscape ----
+  const concrete = mat(0xc9c5bb), paver = mat(0xb08a6a), asphalt = mat(0x55575a), mulch = mat(0x5a3b26, { roughness: 1 });
+  slab(44000, 1500, 0, -12250, asphalt, 4);                      // street
+  slab(44000, 1200, 0, -10900, concrete, 5);                     // sidewalk
+  slab(4000, 12300, 4500, -4150, concrete, 6);                   // driveway
+  slab(900, 12300, -2500, -4150, paver, 6);                      // front path
+  box(3200, 900, 120, -2500, 1550, 0, concrete);                 // porch step
+  cols.push({ x0: -4100, y0: 1100, x1: -900, y1: 2000 });
+  slab(6000, 3000, -2000, 12500, paver, 6);                      // back patio
+  slab(9200, 1300, -2400, 1300, mulch, 7);                       // front foundation bed
+  slab(5200, 1300, 4500, 11650, mulch, 7);                       // back bed
+
+  // ---- house ----
+  const wall = mat(0xe7e2d6), trim = mat(0x3b3f45), roofM = mat(0x5e5a55), glass = mat(0x9ec4dc, { roughness: 0.3, metalness: 0.2 }), door = mat(0x8a2f1f);
+  box(14000, 9000, 3000, 0, 6500, 0, wall);
+  cols.push({ x0: -7300, y0: 1700, x1: 7300, y1: 11300 });
+  (() => {                                                        // gable roof, ridge along x
+    const s = new THREE.Shape(); s.moveTo(-5000, 2990); s.lineTo(5000, 2990); s.lineTo(0, 5600); s.closePath();
+    const g = new THREE.ExtrudeGeometry(s, { depth: 14800, bevelEnabled: false });
+    const r = new THREE.Mesh(g, roofM); r.matrixAutoUpdate = false;
+    r.matrix.set(0, 0, 1, -7400, 1, 0, 0, 6500, 0, 1, 0, 0, 0, 0, 0, 1); r.castShadow = true; r.receiveShadow = true; scene.add(r);
+  })();
+  box(14400, 9400, 160, 0, 6500, 2900, trim, false);             // eave band
+  box(900, 900, 1600, 3200, 8500, 5100, mat(0x9a5a44));          // chimney
+  box(1000, 60, 2100, -2500, 1990, 0, door);                     // front door
+  box(1400, 50, 2300, 4500, 1990, 0, mat(0xd9d4c8));             // garage door (reads as a door in the wall)
+  [[-5200, 1990, 0], [-500, 1990, 0], [1800, 1990, 0], [-7020, 5000, 1], [-7020, 8500, 1], [7020, 5000, 1], [7020, 8500, 1], [-4000, 11010, 0], [1500, 11010, 0], [5000, 11010, 0]].forEach(([x, y, side]) => {
+    const w = side ? box(50, 1400, 1300, x, y, 1000, glass, false) : box(1400, 50, 1300, x, y, 1000, glass, false); w.receiveShadow = false;
+  });
+  box(3000, 2600, 2300, 14800, 12800, 0, mat(0x7c8a73));          // shed
+  box(3300, 2900, 300, 14800, 12800, 2300, roofM);
+  cols.push({ x0: 13000, y0: 11200, x1: 16600, y1: 14400 });
+  box(4000, 2500, 320, -12000, 9500, 0, mat(0x6b4b32));          // raised vegetable bed
+  cols.push({ x0: -14200, y0: 8100, x1: -9800, y1: 10900 });
+  for (let i = 0; i < 8; i++) cyl(160 + Math.random() * 80, 450, -13600 + i * 460 + (i % 2) * 100, 9100 + (i % 3) * 400, 320, mat(0x3f8a2e));
+
+  // ---- plants ----
+  const leaf = [mat(0x3e7d2a), mat(0x4a8f33), mat(0x2f6a22)];
+  function tree(x, y, r, h) {
+    cyl(r * 0.1, h * 0.55, x, y, 0, mat(0x6b4a2f));
+    const c = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 12), leaf[Math.abs(Math.round((x + y) / 1000)) % 3]); c.position.set(x, y, h * 0.55 + r * 0.7); c.scale.set(1, 1, 0.85); c.castShadow = true; scene.add(c);
+    const c2 = new THREE.Mesh(new THREE.SphereGeometry(r * 0.7, 14, 10), leaf[1]); c2.position.set(x + r * 0.4, y - r * 0.3, h * 0.55 + r * 1.1); c2.castShadow = true; scene.add(c2);
+    cols.push({ x: x, y: y, r: r * 0.1 + 300 });
+  }
+  function shrub(x, y, r) { const s = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 9), leaf[2]); s.position.set(x, y, r * 0.75); s.scale.set(1, 1, 0.8); s.castShadow = true; scene.add(s); cols.push({ x, y, r: r + 150 }); }
+  function flowers(x0, x1, y, n) { const cs = [0xe84b6a, 0xf2c14e, 0xffffff, 0xb55bd6]; for (let i = 0; i < n; i++) { const f = new THREE.Mesh(new THREE.SphereGeometry(70, 6, 5), mat(cs[i % 4])); f.position.set(x0 + (x1 - x0) * (i + 0.5) / n, y + (Math.random() - 0.5) * 300, 220); scene.add(f); cyl(10, 200, f.position.x, f.position.y, 0, leaf[0]); } }
+  tree(-12500, -5000, 2600, 4800); tree(12500, -6500, 2200, 4200); tree(-14500, 12800, 2800, 5200); tree(10000, 8500, 2000, 3800); tree(-7000, 13000, 1800, 3400); tree(16000, 2000, 2400, 4400);
+  [-6200, -4800, -3800, -1200, 0, 1200].forEach(x => shrub(x, 1300, 500));
+  shrub(2600, 11700, 500); shrub(4300, 11700, 550); shrub(6000, 11700, 500);
+  flowers(-6800, -3000, 700, 10); flowers(-1800, 1800, 700, 8); flowers(2200, 6800, 11600, 10);
+
+  // ---- fences: posts and two rails, with an open side gate on the left ----
+  const fenceM = mat(0xb7a27f), postM = mat(0x9c8763);
+  function fence(x0, y0, x1, y1) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy), n = Math.max(1, Math.round(L / 2400)), ang = Math.atan2(dy, dx);
+    for (let i = 0; i <= n; i++) box(110, 110, 1250, x0 + dx * i / n, y0 + dy * i / n, 0, postM);
+    [450, 1000].forEach(z => { const r = box(L, 60, 140, (x0 + x1) / 2, (y0 + y1) / 2, z, fenceM, false); r.rotation.z = ang; });
+    const pad = 150; cols.push({ x0: Math.min(x0, x1) - pad, y0: Math.min(y0, y1) - pad, x1: Math.max(x0, x1) + pad, y1: Math.max(y0, y1) + pad });
+  }
+  fence(-18000, 14800, 18000, 14800); fence(-18000, 4000, -18000, 14800); fence(18000, 4000, 18000, 14800);
+  fence(-18000, 4000, -10400, 4000); fence(-9000, 4000, -7000, 4000); fence(7000, 4000, 18000, 4000);
+  (() => { const a = 2.5, g = box(1300, 60, 1150, 0, 0, 60, fenceM); g.position.set(-10400 + Math.cos(a) * 650, 4000 + Math.sin(a) * 650, 60 + 575); g.rotation.z = a; cols.push({ x: -10900, y: 4350, r: 350 }); })();
+
+  // ---- props: mailbox, package, charging dock ----
+  cyl(40, 1100, 7000, -10500, 0, trim); box(500, 220, 240, 7000, -10500, 1100, mat(0x2b2b2b)); cols.push({ x: 7000, y: -10500, r: 250 });
+  box(420, 320, 260, -2500, 1450, 120, mat(0xc19a6b));
+  (() => {
+    const dock = new THREE.Group(); dock.position.set(7500, 7000, 0); scene.add(dock);
+    DOCK.forEach(a => { const g = geos[a.part]; if (!g) return; const m = new THREE.Mesh(g, mat(0x9aa0a6, { roughness: 0.7 })); m.matrixAutoUpdate = false; m.matrix.copy(opsMatrix(a.ops)); m.castShadow = true; m.receiveShadow = true; dock.add(m); });
+  })();
+
+  // ---- the robot ----
+  function opsMatrix(ops) { const m = new THREE.Matrix4(); ops.forEach(([k, v]) => { const t = new THREE.Matrix4(); if (k === "t") t.makeTranslation(v[0], v[1], v[2]); else if (k === "rx") t.makeRotationX(THREE.MathUtils.degToRad(v)); else if (k === "ry") t.makeRotationY(THREE.MathUtils.degToRad(v)); else if (k === "rz") t.makeRotationZ(THREE.MathUtils.degToRad(v)); m.premultiply(t); }); return m; }
+  const robot = new THREE.Group(); scene.add(robot);
+  const petg = mat(0xc3c7cb, { roughness: 0.55 }), body = mat(0xe0601a, { roughness: 0.5 }), rubber = mat(0x26282a, { roughness: 0.95 }), dark = mat(0x4a4e52, { roughness: 0.6 });
+  function partMat(a) {
+    const m = byPart[a.part] || {};
+    if (/TPU/.test(m.material)) return rubber;
+    if (/^(canopy|fender|skirt|bumper_carrier|oak_mount|light_bar)/.test(a.part)) return body;
+    if (/^(enclosure|estop|camera_housing|pan_base|tilt_bracket)/.test(a.part)) return dark;
+    return petg;
+  }
+  // Moving sub-assemblies: each gets a group at its pivot so it can spin or swivel.
+  const AXLE = { z: 150, x: -160 }, TRACK = 404, R_WHEEL = 150, R_CASTER = 140;
+  const pivots = {
+    wheel_left: { at: [-160, 162, 150] }, tread_left: { at: [-160, 162, 150] },
+    wheel_right: { at: [-160, -162, 150] }, tread_right: { at: [-160, -162, 150] },
+  };
+  const casters = {};
+  ["left", "right"].forEach(s => {
+    const sy = s === "left" ? 1 : -1;
+    const yaw = new THREE.Group(); yaw.position.set(280, sy * 205, 0); robot.add(yaw);
+    const wy = s === "left" ? 155 : -255;
+    const spin = new THREE.Group(); spin.position.set(230 - 280, wy - sy * 205, 140); yaw.add(spin);
+    casters[s] = { yaw, spin, px: 280, py: sy * 205, angle: 0 };
+    ["fork_", "sleeve_"].forEach(p => pivots[p + s] = { group: yaw, at: [280, sy * 205, 0] });
+    ["caster_rim_", "caster_tire_"].forEach(p => pivots[p + s] = { group: spin, at: [230, wy, 140] });
+  });
+  const wheels = {};
+  ["left", "right"].forEach(s => { const g = new THREE.Group(); g.position.set(-160, s === "left" ? 162 : -162, 150); robot.add(g); wheels[s] = g; pivots["wheel_" + s].group = g; pivots["tread_" + s].group = g; });
+  asmRobot.forEach(a => {
+    const g = geos[a.part]; if (!g) return;
+    const mesh = new THREE.Mesh(g, partMat(a)); mesh.castShadow = true; mesh.receiveShadow = true; mesh.matrixAutoUpdate = false;
+    const p = pivots[a.instance];
+    if (p) { mesh.matrix.copy(opsMatrix(a.ops)).premultiply(new THREE.Matrix4().makeTranslation(-p.at[0], -p.at[1], -p.at[2])); p.group.add(mesh); }
+    else { mesh.matrix.copy(opsMatrix(a.ops)); robot.add(mesh); }
+  });
+
+  // ---- driving ----
+  const START = { x: -2500, y: -6500, h: Math.PI / 2 };
+  const st = { x: START.x, y: START.y, h: START.h, v: 0, w: 0 };   // x, y: drive axle midpoint; h: heading; v mm/s; w rad/s
+  const keys = {};
+  const V_MAX = 1000, V_REV = 600, W_MAX = 1.5;
+  function collides(cx, cy, r) {
+    if (cx - r < YARD.x0 || cx + r > YARD.x1 || cy - r < YARD.y0 || cy + r > YARD.y1) return true;
+    for (const c of cols) {
+      if (c.r !== undefined) { if (Math.hypot(cx - c.x, cy - c.y) < c.r + r) return true; }
+      else { const nx = Math.max(c.x0, Math.min(cx, c.x1)), ny = Math.max(c.y0, Math.min(cy, c.y1)); if (Math.hypot(cx - nx, cy - ny) < r) return true; }
+    }
+    return false;
+  }
+  const CHECKS = [
+    { x: -2500, y: 500, r: 2600, msg: "Front porch: package by the door. Photo sent.", t: -1e9 },
+    { x: -9700, y: 4000, r: 2600, msg: "Side gate is open. Alert sent with photo.", t: -1e9 },
+    { x: 7000, y: -9800, r: 2200, msg: "Mailbox checked. All clear.", t: -1e9 },
+    { x: 14800, y: 10200, r: 2800, msg: "Shed checked. Door closed, no damage.", t: -1e9 },
+    { x: 7500, y: 7000, r: 1500, msg: "Charging dock in view. Docking available.", t: -1e9 },
+  ];
+  const hudMsg = document.getElementById("hud-msg"), hudSpeed = document.getElementById("hud-speed");
+  let msgUntil = 0, driven = false;
+  function say(m, now) { hudMsg.textContent = m; msgUntil = now + 5; }
+  function step(dt, now) {
+    const fwd = keys.w || keys.ArrowUp, back = keys.s || keys.ArrowDown, left = keys.a || keys.ArrowLeft, right = keys.d || keys.ArrowRight;
+    const vT = fwd ? V_MAX : back ? -V_REV : 0, wT = (left ? W_MAX : 0) - (right ? W_MAX : 0);
+    st.v += Math.max(-1800 * dt, Math.min(1800 * dt, vT - st.v));
+    st.w += Math.max(-6 * dt, Math.min(6 * dt, wT - st.w));
+    if (Math.abs(st.v) < 1 && !vT) st.v = 0;
+    const nh = st.h + st.w * dt, nx = st.x + st.v * Math.cos(st.h) * dt, ny = st.y + st.v * Math.sin(st.h) * dt;
+    const cx = nx + Math.cos(nh) * 185, cy = ny + Math.sin(nh) * 185;
+    if (collides(cx, cy, 360)) { if (st.v !== 0) say("Bumper pressed. Stopped.", now); st.v = 0; }
+    else { st.x = nx; st.y = ny; }
+    st.h = nh;
+    // wheels: v_l = v - w*track/2, v_r = v + w*track/2
+    wheels.left.rotation.y += (st.v - st.w * TRACK / 2) / R_WHEEL * dt;
+    wheels.right.rotation.y += (st.v + st.w * TRACK / 2) / R_WHEEL * dt;
+    // casters swing toward the velocity of their pivot (trailing behind it) and roll with it
+    Object.values(casters).forEach(c => {
+      const vx = st.v - st.w * c.py, vy = st.w * c.px, sp = Math.hypot(vx, vy);
+      if (sp > 15) {
+        const want = Math.atan2(vy, vx); let d = want - c.angle; d = Math.atan2(Math.sin(d), Math.cos(d));
+        const k = Math.min(1, sp / 70 * dt); c.angle += d * k; c.yaw.rotation.z = c.angle;
+        c.spin.rotation.y += sp * Math.cos(d) / R_CASTER * dt;
+      }
+    });
+    robot.position.set(st.x - Math.cos(st.h) * AXLE.x, st.y - Math.sin(st.h) * AXLE.x, 0); robot.rotation.z = st.h;
+    hudSpeed.textContent = (Math.abs(st.v) / 1000).toFixed(2);
+    CHECKS.forEach(c => { if (Math.hypot(st.x - c.x, st.y - c.y) < c.r && now - c.t > 25) { c.t = now; say(c.msg, now); } });
+    if (now > msgUntil && driven && hudMsg.textContent !== "Patrolling.") hudMsg.textContent = "Patrolling.";
+  }
+
+  // ---- camera: orbit around the robot, with the orbit offset kept in the robot's frame ----
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 1200; controls.maxDistance = 14000; controls.maxPolarAngle = 1.48;
+  const camLocal = new THREE.Vector3(-2600, 1500, 1250);
+  function placeCamera() {
+    const t = robot.position.clone().setZ(380);
+    const off = camLocal.clone().applyAxisAngle(new THREE.Vector3(0, 0, 1), st.h);
+    camera.position.copy(t).add(off); controls.target.copy(t);
+  }
+  placeCamera(); controls.update();
+
+  // ---- input ----
+  const DRIVE_KEYS = ["w", "a", "s", "d", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+  function active() { return document.activeElement === canvas || hovered; }
+  let hovered = false;
+  canvas.addEventListener("pointerenter", () => { hovered = true; }); canvas.addEventListener("pointerleave", () => { hovered = false; });
+  canvas.addEventListener("pointerdown", () => canvas.focus({ preventScroll: true }));
+  window.addEventListener("keydown", e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; if (!DRIVE_KEYS.includes(k) || !active()) return; keys[k] = true; driven = true; e.preventDefault(); });
+  window.addEventListener("keyup", e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; if (DRIVE_KEYS.includes(k)) keys[k] = false; });
+  window.addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
+  document.querySelectorAll(".pad button").forEach(b => {
+    const k = b.dataset.k, on = e => { keys[k] = true; driven = true; e.preventDefault(); b.setPointerCapture && b.setPointerCapture(e.pointerId); }, off = () => { keys[k] = false; };
+    b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointercancel", off); b.addEventListener("lostpointercapture", off);
+  });
+  document.getElementById("hero-reset").addEventListener("click", () => { Object.assign(st, { x: START.x, y: START.y, h: START.h, v: 0, w: 0 }); camLocal.set(-2600, 1500, 1250); CHECKS.forEach(c => c.t = -1e9); driven = false; hudMsg.textContent = "Back at the start."; msgUntil = 0; placeCamera(); });
+
+  // ---- loop (only renders while the hero is on screen) ----
+  let visible = true;
+  try { new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(canvas); } catch (e) {}
+  let last = performance.now();
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!visible) return;
+    const w = canvas.clientWidth, h = canvas.clientHeight, pr = renderer.getPixelRatio();
+    if (canvas.width !== Math.floor(w * pr) || canvas.height !== Math.floor(h * pr)) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+    // keep the orbit offset in the robot frame, then step and re-place the camera
+    controls.update();
+    camLocal.copy(camera.position).sub(controls.target).applyAxisAngle(new THREE.Vector3(0, 0, 1), -st.h);
+    step(dt, now / 1000);
+    placeCamera();
+    sun.position.set(robot.position.x + 3000, robot.position.y - 2500, 6000); sun.target.position.copy(robot.position);
+    renderer.render(scene, camera);
+  })(last);
+};
+
 (async function () {
   // ---------- Step text ----------
   const STEPS = [
@@ -227,6 +509,8 @@
   let loaded = 0;
   await Promise.all(names.map(n => fetch(`models/${n}.b64.json`).then(r => r.json()).then(j => { const bin = atob(j.stl_b64); const buf = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i); const g = loader.parse(buf.buffer); g.computeVertexNormals(); geos[n] = g; loaded++; document.getElementById("loading").textContent = `loading models... ${loaded}/${names.length}`; }).catch(() => {})));
   document.getElementById("loading").hidden = true;
+  try { window.buildHero(geos, asmRobot, DOCK, byPart); } catch (e) { console.error("hero", e); }
+  document.getElementById("hero-loading").hidden = true;
 
   // Instances
   const root = new THREE.Group(); scene.add(root);

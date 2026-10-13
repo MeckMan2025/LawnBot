@@ -1,4 +1,4 @@
-# ClaudeBot: Outdoor Patrol and Security Robot
+# LawnBot: Outdoor Patrol and Security Robot
 
 Revision 5 (2026-10-12). Supersedes earlier revisions. Changes since revision 1 are folded in: everything structural is printed, PETG for the first build, two rear drive wheels plus two zero-turn-mower-size front casters, the mower-style raised front boom that those casters require, and the corrections that came out of the virtual build audit (phase 1 is complete: 68 parts modelled, exported, interference-checked and assembly-audited).
 
@@ -42,7 +42,7 @@ Overall: about 700 mm long (body plus bumper), 570 mm wide over the caster tower
 
 ## Repo layout
 ```
-ClaudeBot/
+LawnBot/
   PLAN.md
   .venv/                   # CadQuery 2.8 (system CadQuery is broken with NumPy 2)
   cad/
